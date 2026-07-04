@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>문서센터 | 도시아재 GPTERS 23기 Codex 앱 스터디</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <style>
+    :root {
+      --ink: #17202a;
+      --muted: #647084;
+      --line: #1e293b;
+      --bg: #f4f1e8;
+      --surface: #ffffff;
+      --paper: #fffaf0;
+      --mint: #dff8ed;
+      --sky: #dbeafe;
+      --peach: #ffead5;
+      --rose: #ffe4e6;
+      --green: #0f766e;
+      --blue: #2563eb;
+      --shadow: 4px 4px 0 #1e293b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(30, 41, 59, 0.035) 1px, transparent 1px),
+        linear-gradient(rgba(30, 41, 59, 0.035) 1px, transparent 1px),
+        var(--bg);
+      background-size: 28px 28px;
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .shell {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px 18px 48px;
+    }
+
+    .hero,
+    .doc,
+    .nav-card,
+    .info-card,
+    .callout {
+      border: 1.5px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: start;
+      margin-bottom: 16px;
+      padding: 22px;
+      background: var(--paper);
+    }
+
+    .eyebrow {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 0 0 10px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: 5px 9px;
+      border: 1.5px solid var(--line);
+      border-radius: 999px;
+      background: var(--mint);
+      color: #064e3b;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .badge.sky {
+      background: var(--sky);
+      color: #1d4ed8;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 32px;
+      line-height: 1.18;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      max-width: 780px;
+      margin: 10px 0 0;
+      color: #334155;
+      font-size: 15px;
+      font-weight: 650;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 38px;
+      padding: 8px 12px;
+      border: 1.5px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 2px 2px 0 var(--line);
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 330px minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .nav-card {
+      position: sticky;
+      top: 14px;
+      padding: 14px;
+      background: #fffdf7;
+    }
+
+    .nav-title {
+      margin: 0 0 10px;
+      font-size: 16px;
+      font-weight: 950;
+    }
+
+    .doc-menu {
+      display: grid;
+      gap: 8px;
+    }
+
+    .doc-button {
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      gap: 9px;
+      align-items: center;
+      width: 100%;
+      min-height: 48px;
+      padding: 9px;
+      border: 1.5px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 2px 2px 0 var(--line);
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .doc-button:hover,
+    .doc-button.active {
+      transform: translate(-1px, -1px);
+      background: var(--ink);
+      color: #fff;
+      box-shadow: 3px 3px 0 var(--line);
+    }
+
+    .doc-button .emoji {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: var(--sky);
+      font-size: 16px;
+    }
+
+    .doc-button.active .emoji,
+    .doc-button:hover .emoji {
+      background: #fff;
+    }
+
+    .doc-button strong {
+      display: block;
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    .doc-button span:not(.emoji) {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .doc-button.active span:not(.emoji),
+    .doc-button:hover span:not(.emoji) {
+      color: #dbeafe;
+    }
+
+    .doc {
+      min-height: 620px;
+      padding: 22px;
+      background: #fff;
+    }
+
+    .doc-header {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1.5px solid #d4d9e2;
+    }
+
+    .doc-kicker {
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .doc h2 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .doc-desc {
+      max-width: 760px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .info-card {
+      padding: 13px;
+      background: #fffdf7;
+      box-shadow: 2px 2px 0 var(--line);
+    }
+
+    .info-card strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+
+    .info-card p,
+    .info-card li {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .info-card p {
+      margin: 0;
+    }
+
+    .info-card ul,
+    .info-card ol {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .callout {
+      margin-top: 14px;
+      padding: 14px;
+      background: var(--mint);
+      box-shadow: 2px 2px 0 var(--line);
+      color: #064e3b;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .callout.warn {
+      background: var(--rose);
+      color: #7f1d1d;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .action-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 38px;
+      padding: 8px 12px;
+      border: 1.5px solid var(--line);
+      border-radius: 8px;
+      background: var(--sky);
+      box-shadow: 2px 2px 0 var(--line);
+      color: #1d4ed8;
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .action-link.secondary {
+      background: #fff;
+      color: var(--ink);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      padding: 9px;
+      border-bottom: 1px solid #d4d9e2;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 900;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 920px) {
+      .hero,
+      .layout,
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-card {
+        position: static;
+      }
+
+      h1 {
+        font-size: 27px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">
+          <span class="badge">📚 문서센터</span>
+          <span class="badge sky">도시아재</span>
+        </p>
+        <h1>GPTERS 23기 Codex 앱 스터디 문서센터</h1>
+        <p class="subtitle">대시보드의 주요 문서를 Markdown 원문이 아니라 발표와 공유에 적합한 HTML 카드 형태로 읽습니다.</p>
+      </div>
+      <a class="back-link" href="index.html#artifacts">← 대시보드로 돌아가기</a>
+    </header>
+
+    <section class="layout">
+      <aside class="nav-card" aria-label="문서 목록">
+        <p class="nav-title">문서 선택</p>
+        <div class="doc-menu" id="docMenu"></div>
+      </aside>
+
+      <article class="doc" id="docContent" aria-live="polite"></article>
+    </section>
+  </main>
+
+  <script>
+    const documents = {
+      "week1-assignment": {
+        emoji: "📝",
+        title: "Week 1 과제 초안",
+        label: "제출용 설명문",
+        source: "../../docs/week1-assignment-draft.md",
+        desc: "첫 주 미니사례에서 내가 어떤 업무를 자동화하려는지 설명하는 제출용 초안입니다.",
+        sections: [
+          { title: "자동화하고 싶은 업무", body: "공부서류 기반 매물 브리핑 초안 작성입니다. 건축물대장, 등기부등본, 토지이용계획, 실거래가, 현장 메모를 고객 설명용 자료와 내부 검수표로 정리하는 반복 업무를 Codex로 줄이려는 계획입니다." },
+          { title: "현재 처리 방식", list: ["주소와 거래 조건 확인", "건축물대장 핵심 수치 확인", "등기부 권리관계 확인", "토지이용계획과 시세 확인", "고객 설명 문구와 내부 검수 항목 분리"] },
+          { title: "Codex에게 맡길 부분", body: "최종 판단이 아니라 입력자료 목록화, 핵심 수치 추출, 누락·충돌 항목 표시, 고객 설명 초안, 내부 검수 체크리스트 생성을 맡깁니다." },
+          { title: "사례로 좋은 이유", body: "본업과 AI 중개실무 강의가 동시에 연결됩니다. 공인중개사가 AI를 어떻게 안전하게 검수하며 쓰는지 보여주기 좋습니다." }
+        ],
+        callout: "Week 1에는 완성보다 방향과 기준을 보여주는 미니사례로 충분합니다."
+      },
+      "agent-guide": {
+        emoji: "🤖",
+        title: "에이전트 지시서",
+        label: "반복 실행 기준",
+        source: "../../agents/property-briefing-agent.md",
+        desc: "공부서류 기반 매물 브리핑 자동화를 반복 실행하기 위한 Codex 작업지시서입니다.",
+        sections: [
+          { title: "역할", body: "Codex는 입력자료를 바탕으로 고객 설명 초안과 내부 검수표를 만듭니다. 법적 판단과 최종 고객 전달 판단은 공인중개사가 수행합니다." },
+          { title: "입력자료", list: ["건축물대장", "등기부등본", "토지이용계획", "실거래가 또는 주변 시세", "현장 메모", "고객 질문"] },
+          { title: "출력물", list: ["핵심 정보 표", "고객 설명용 브리핑 초안", "추가 확인 필요 항목", "내부 검수 체크리스트", "공개 사례글용 비식별 요약"] },
+          { title: "검수 원칙", body: "주소, 면적, 가격, 용도, 권리관계는 원문 기준으로 확인하고, 확인됨·추가 확인 필요·자료 없음으로 분리합니다." }
+        ],
+        warning: "실제 매물 정보는 공개 저장소에 올리지 않고 비식별 샘플만 사용합니다."
+      },
+      "progress": {
+        emoji: "📈",
+        title: "진행 추적표",
+        label: "계획 대비 실천 관리",
+        source: "../../docs/progress-tracker.md",
+        desc: "4주 동안 계획, 실천, 수정계획이 어디까지 진행됐는지 확인하는 운영판입니다.",
+        sections: [
+          { title: "현재 완료", list: ["운영 문서와 대시보드 구축", "Week 1 미니사례 방향 수립", "추천 후보와 주차별 루틴 반영", "GitHub와 Vercel 배포 완료"] },
+          { title: "아직 필요한 입력", list: ["최근 반복 업무 5개", "각 업무의 대략 또는 실측 소요 시간", "첫 번째 Before 측정", "Codex 적용 후 After 측정"] },
+          { title: "주차별 기준", body: "Week 1은 계획형 미니사례, Week 2는 매물 브리핑 사례, Week 3은 상담 또는 홍보 자동화, Week 4는 강의자료와 최종 발표 완성으로 관리합니다." },
+          { title: "핵심 리스크", body: "수치 오류, 법적 단정, 개인정보 노출, AI 결과 과신을 계속 분리해서 관리합니다." }
+        ],
+        callout: "매주 수요일 전에는 이 표를 기준으로 한 줄이라도 실천 결과를 업데이트합니다."
+      },
+      "evidence": {
+        emoji: "🧾",
+        title: "증거 장부",
+        label: "근거와 산출물 기록",
+        source: "../../docs/evidence-ledger.md",
+        desc: "사례글에 쓸 명령, 산출물, 검증 결과를 누적하는 장부입니다.",
+        sections: [
+          { title: "기록할 것", list: ["실행 날짜", "사용한 입력자료", "Codex에게 준 지시", "생성된 산출물", "소요 시간", "사람이 수정한 내용"] },
+          { title: "왜 필요한가", body: "GPTERS 사례글은 느낌보다 근거가 중요합니다. 실제로 무엇을 했고 무엇이 줄었는지를 증거로 남겨야 합니다." },
+          { title: "공개 기준", body: "공개 가능한 파일과 비공개 원자료를 분리합니다. 실제 주소, 소유자, 연락처, 계약 정보는 공개하지 않습니다." }
+        ],
+        warning: "실제 고객·매물 식별정보는 GitHub/Vercel에 올리지 않습니다."
+      },
+      "sample-input": {
+        emoji: "🏠",
+        title: "샘플 입력",
+        label: "비식별 매물 자료",
+        source: "../../samples/property-briefing-sample-input.md",
+        desc: "실제 고객·매물 정보 없이 실습할 수 있는 가상 매물 입력자료입니다.",
+        sections: [
+          { title: "용도", body: "Codex 브리핑 에이전트를 안전하게 테스트하기 위한 비식별 샘플입니다." },
+          { title: "포함 항목", list: ["가상 주소", "거래 조건", "건축물대장 형식의 기본 정보", "등기부 확인 항목", "토지이용계획과 시세 메모", "현장 메모"] },
+          { title: "사용 방법", body: "이 자료를 입력으로 삼아 브리핑 초안과 내부 검수 체크리스트가 제대로 분리되는지 확인합니다." }
+        ],
+        warning: "샘플은 실습용이며 고객 제공용 자료가 아닙니다."
+      },
+      "sample-output": {
+        emoji: "📄",
+        title: "샘플 출력",
+        label: "브리핑 v0",
+        source: "../../output/property-briefing-sample/briefing-v0.md",
+        desc: "비식별 샘플 입력을 바탕으로 만든 브리핑 초안 예시입니다.",
+        sections: [
+          { title: "구성", list: ["핵심 정보 표", "고객 설명 초안", "추가 확인 필요 항목", "내부 검수 체크리스트"] },
+          { title: "확인 포인트", body: "고객에게 바로 보낼 문장과 내부에서만 봐야 할 검수 항목이 분리되어 있는지 확인합니다." },
+          { title: "개선 방향", body: "실제 업무 1건을 기준으로 용어, 표 형식, 금지 표현 검수 기준을 보강합니다." }
+        ],
+        callout: "Week 2 사례의 기본 샘플로 사용할 수 있습니다."
+      },
+      "presentation": {
+        emoji: "🎤",
+        title: "발표 슬라이드",
+        label: "3분 발표 초안",
+        source: "../final-presentation/index.html",
+        desc: "첫주 미니사례와 최종 발표에 활용할 HTML 슬라이드입니다.",
+        sections: [
+          { title: "발표 흐름", list: ["문제: 반복되는 중개실무 정리", "계획: Codex 앱으로 초안과 검수표 생성", "실천: 2~4주 매주 사례 누적", "결과: 에이전트 시스템과 강의자료 완성"] },
+          { title: "사용 시점", body: "Week 1에는 계획 발표용으로, Week 4에는 실제 측정 결과와 산출물을 추가한 최종 발표용으로 사용합니다." }
+        ],
+        links: [{ label: "슬라이드 열기", href: "../final-presentation/index.html" }]
+      },
+      "speaker-notes": {
+        emoji: "🗣️",
+        title: "발표 대본",
+        label: "시간대별 멘트",
+        source: "../../output/final-presentation/speaker-notes.md",
+        desc: "3분 안에 핵심을 말할 수 있도록 정리한 발표 멘트입니다.",
+        sections: [
+          { title: "핵심 메시지", body: "공인중개사 업무 자동화는 AI가 대신 판단하는 것이 아니라, 반복 정리와 검수 준비를 맡기고 사람이 최종 판단하는 구조로 가야 합니다." },
+          { title: "말할 순서", list: ["내 업무의 반복 문제", "선정한 자동화 주제", "4주 실행 루틴", "검수와 비식별 원칙", "기대 결과"] }
+        ]
+      },
+      "week1-submit": {
+        emoji: "✅",
+        title: "Week 1 제출본",
+        label: "과제 본문",
+        source: "../../output/week1-submission/week1-assignment.md",
+        desc: "GPTERS에 제출할 수 있는 Week 1 과제 본문입니다.",
+        sections: [
+          { title: "제출 요지", body: "자동화하고 싶은 업무는 공부서류 기반 매물 브리핑 초안 작성입니다. Codex에게 초안과 체크리스트를 맡기고 공인중개사가 최종 검수합니다." },
+          { title: "포함 내용", list: ["현재 처리 방식", "측정할 소요 시간 항목", "Codex에게 맡길 부분", "선택 이유", "Week 1 이후 실험 계획"] }
+        ],
+        callout: "반복 업무 5개와 실측 시간이 들어오면 더 구체적인 제출본으로 업데이트합니다."
+      },
+      "reply-template": {
+        emoji: "💬",
+        title: "답변 템플릿",
+        label: "반복 업무 5개 입력",
+        source: "../../output/week1-submission/quick-reply-template.md",
+        desc: "도시아재가 반복 업무 후보와 시간을 빠르게 알려줄 때 쓰는 입력 양식입니다.",
+        sections: [
+          { title: "필요한 답변", list: ["1순위 업무명", "2순위 업무명", "3순위 업무명", "각 업무의 회당 소요 시간", "왜 자동화하고 싶은지"] },
+          { title: "사용 방식", body: "이 템플릿으로 답하면 Codex가 CSV, 우선순위표, Week 1 제출본, 대시보드를 한 번에 갱신할 수 있습니다." }
+        ]
+      },
+      "automation-menu": {
+        emoji: "🧭",
+        title: "자동화 후보",
+        label: "중개업무·강의준비",
+        source: "../../docs/recommended-automation-menu.md",
+        desc: "실제 중개업무와 AI 강의 준비를 함께 고려한 자동화 후보 목록입니다.",
+        sections: [
+          { title: "일반 중개업무 후보", list: ["공부서류 기반 매물 브리핑", "고객 상담 요약 및 후속 문자", "매물 홍보 문구 생성", "권리·공부서류 확인 체크리스트", "매물 비교표"] },
+          { title: "강의 준비 후보", list: ["AI 중개실무 커리큘럼", "공인중개사용 프롬프트 모음", "비식별 실습 매물 자료", "강의 후 Q&A 정리", "수강생 과제 피드백 초안"] },
+          { title: "1차 추천 조합", body: "공부서류 기반 매물 브리핑을 메인 사례로 두고, 상담 요약과 공인중개사용 AI 프롬프트 모음을 확장 후보로 둡니다." }
+        ],
+        callout: "중개업무 1개와 강의자료 1개를 연결하면 도시아재의 강점이 잘 드러납니다."
+      },
+      "benchmark": {
+        emoji: "🔎",
+        title: "벤치마킹 메모",
+        label: "이전 기수 장점 반영",
+        source: "../../docs/benchmark-cola-dashboard.md",
+        desc: "이전 기수 콜라 대시보드에서 이번 23기에 가져올 점을 정리한 문서입니다.",
+        sections: [
+          { title: "가져올 점", list: ["후보를 먼저 보여주는 대시보드", "카테고리로 난이도 분리", "시스템 아키텍처", "카드형 시나리오", "바로 실행할 프롬프트"] },
+          { title: "그대로 가져오지 않을 점", body: "이번 기수는 OpenClaw/n8n 중심이 아니라 Codex App 기능을 실제 반복업무에 붙이는 과정입니다. 그래서 후보 수를 줄이고 실행 사례 누적에 집중합니다." }
+        ]
+      },
+      "context": {
+        emoji: "🧩",
+        title: "컨텍스트 인계",
+        label: "압축 후 이어가기",
+        source: "../../docs/context-handoff.md",
+        desc: "대화 컨텍스트가 압축되거나 새로 이어질 때 프로젝트를 복구하기 위한 인수인계 문서입니다.",
+        sections: [
+          { title: "현재 목표", body: "GPTERS 23기 Codex 앱 4주 스터디 동안 공인중개사 업무 자동화 에이전트 시스템을 기획, 실행, 기록하여 최종 사례글과 발표 자료까지 완성합니다." },
+          { title: "다음에 할 일", list: ["반복 업무 5개와 소요 시간 받기", "CSV와 제출 요약 갱신", "Before/After 실측", "사례글과 발표 자료 업데이트"] },
+          { title: "이어가기 문장", body: "docs/context-handoff.md와 scripts/Test-StudyReadiness.ps1 결과를 기준으로 GPTERS 23기 Codex 앱 스터디 목표를 이어서 진행해줘." }
+        ]
+      }
+    };
+
+    const menu = document.getElementById("docMenu");
+    const content = document.getElementById("docContent");
+
+    function cardHtml(section) {
+      const list = section.list ? `<ul>${section.list.map((item) => `<li>${item}</li>`).join("")}</ul>` : "";
+      const body = section.body ? `<p>${section.body}</p>` : "";
+      return `<section class="info-card"><strong>${section.title}</strong>${body}${list}</section>`;
+    }
+
+    function renderDoc(key) {
+      const doc = documents[key] || documents["week1-assignment"];
+      document.querySelectorAll(".doc-button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.doc === key);
+      });
+
+      const sections = doc.sections.map(cardHtml).join("");
+      const callout = doc.callout ? `<div class="callout">${doc.callout}</div>` : "";
+      const warning = doc.warning ? `<div class="callout warn">${doc.warning}</div>` : "";
+      const links = [
+        ...(doc.links || []),
+        { label: "원본 파일 보기", href: doc.source, secondary: true }
+      ];
+
+      content.innerHTML = `
+        <header class="doc-header">
+          <div class="doc-kicker">${doc.emoji} ${doc.label}</div>
+          <h2>${doc.title}</h2>
+          <p class="doc-desc">${doc.desc}</p>
+        </header>
+        <div class="info-grid">${sections}</div>
+        ${callout}
+        ${warning}
+        <div class="action-row">
+          ${links.map((link) => `<a class="action-link ${link.secondary ? "secondary" : ""}" href="${link.href}">${link.label}</a>`).join("")}
+        </div>
+      `;
+    }
+
+    Object.entries(documents).forEach(([key, doc]) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "doc-button";
+      button.dataset.doc = key;
+      button.innerHTML = `<span class="emoji">${doc.emoji}</span><span><strong>${doc.title}</strong><span>${doc.label}</span></span>`;
+      button.addEventListener("click", () => {
+        location.hash = key;
+        renderDoc(key);
+      });
+      menu.appendChild(button);
+    });
+
+    function currentKey() {
+      const key = decodeURIComponent(location.hash.replace("#", ""));
+      return documents[key] ? key : "week1-assignment";
+    }
+
+    window.addEventListener("hashchange", () => renderDoc(currentKey()));
+    renderDoc(currentKey());
+  </script>
+</body>
+</html>

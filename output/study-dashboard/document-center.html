@@ -378,7 +378,7 @@
         <h1>GPTERS 23기 Codex 앱 스터디 문서센터</h1>
         <p class="subtitle">대시보드의 주요 문서를 Markdown 원문이 아니라 발표와 공유에 적합한 HTML 카드 형태로 읽습니다.</p>
       </div>
-      <a class="back-link" href="index.html#artifacts">← 대시보드로 돌아가기</a>
+      <a class="back-link" id="backLink" href="index.html#artifacts">← 대시보드로 돌아가기</a>
     </header>
 
     <section class="layout">
@@ -560,6 +560,9 @@
 
     const menu = document.getElementById("docMenu");
     const content = document.getElementById("docContent");
+    const isFilePage = location.protocol === "file:";
+    const dashboardBase = isFilePage ? "" : "/output/study-dashboard/";
+    document.getElementById("backLink").href = `${dashboardBase}${isFilePage ? "index.html" : ""}#artifacts`;
 
     function cardHtml(section) {
       const list = section.list ? `<ul>${section.list.map((item) => `<li>${item}</li>`).join("")}</ul>` : "";

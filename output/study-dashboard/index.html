@@ -1082,20 +1082,20 @@
       <section class="panel">
         <h2>주요 문서</h2>
         <div class="artifact-list">
-          <a class="item" href="document-center.html#week1-assignment"><strong>📝 Week 1 과제 초안</strong><span>제출용 설명문</span></a>
-          <a class="item" href="document-center.html#agent-guide"><strong>🤖 에이전트 지시서</strong><span>반복 실행 기준</span></a>
-          <a class="item" href="document-center.html#progress"><strong>📈 진행 추적표</strong><span>계획 대비 실천 관리</span></a>
-          <a class="item" href="document-center.html#evidence"><strong>🧾 증거 장부</strong><span>근거와 산출물 기록</span></a>
-          <a class="item" href="document-center.html#sample-input"><strong>🏠 샘플 입력</strong><span>비식별 매물 자료</span></a>
-          <a class="item" href="document-center.html#sample-output"><strong>📄 샘플 출력</strong><span>브리핑 v0</span></a>
-          <a class="item" href="document-center.html#presentation"><strong>🎤 발표 슬라이드</strong><span>3분 발표 초안</span></a>
-          <a class="item" href="document-center.html#speaker-notes"><strong>🗣️ 발표 대본</strong><span>시간대별 멘트</span></a>
-          <a class="item" href="document-center.html#week1-submit"><strong>✅ Week 1 제출본</strong><span>과제 본문</span></a>
-          <a class="item" href="document-center.html#reply-template"><strong>💬 답변 템플릿</strong><span>반복 업무 5개</span></a>
-          <a class="item" href="document-center.html#automation-menu"><strong>🧭 자동화 후보</strong><span>중개업무·강의준비</span></a>
-          <a class="item" href="document-center.html#benchmark"><strong>🔎 벤치마킹 메모</strong><span>이전 기수 장점 반영</span></a>
+          <a class="item doc-link" href="document-center.html#week1-assignment" data-doc="week1-assignment"><strong>📝 Week 1 과제 초안</strong><span>제출용 설명문</span></a>
+          <a class="item doc-link" href="document-center.html#agent-guide" data-doc="agent-guide"><strong>🤖 에이전트 지시서</strong><span>반복 실행 기준</span></a>
+          <a class="item doc-link" href="document-center.html#progress" data-doc="progress"><strong>📈 진행 추적표</strong><span>계획 대비 실천 관리</span></a>
+          <a class="item doc-link" href="document-center.html#evidence" data-doc="evidence"><strong>🧾 증거 장부</strong><span>근거와 산출물 기록</span></a>
+          <a class="item doc-link" href="document-center.html#sample-input" data-doc="sample-input"><strong>🏠 샘플 입력</strong><span>비식별 매물 자료</span></a>
+          <a class="item doc-link" href="document-center.html#sample-output" data-doc="sample-output"><strong>📄 샘플 출력</strong><span>브리핑 v0</span></a>
+          <a class="item doc-link" href="document-center.html#presentation" data-doc="presentation"><strong>🎤 발표 슬라이드</strong><span>3분 발표 초안</span></a>
+          <a class="item doc-link" href="document-center.html#speaker-notes" data-doc="speaker-notes"><strong>🗣️ 발표 대본</strong><span>시간대별 멘트</span></a>
+          <a class="item doc-link" href="document-center.html#week1-submit" data-doc="week1-submit"><strong>✅ Week 1 제출본</strong><span>과제 본문</span></a>
+          <a class="item doc-link" href="document-center.html#reply-template" data-doc="reply-template"><strong>💬 답변 템플릿</strong><span>반복 업무 5개</span></a>
+          <a class="item doc-link" href="document-center.html#automation-menu" data-doc="automation-menu"><strong>🧭 자동화 후보</strong><span>중개업무·강의준비</span></a>
+          <a class="item doc-link" href="document-center.html#benchmark" data-doc="benchmark"><strong>🔎 벤치마킹 메모</strong><span>이전 기수 장점 반영</span></a>
           <a class="item" href="../gpters-case-study/images/goal-alignment-board.png"><strong>🖼️ 정렬 상태 이미지</strong><span>한눈에 보기</span></a>
-          <a class="item" href="document-center.html#context"><strong>🧩 컨텍스트 인계</strong><span>압축 후 이어가기</span></a>
+          <a class="item doc-link" href="document-center.html#context" data-doc="context"><strong>🧩 컨텍스트 인계</strong><span>압축 후 이어가기</span></a>
         </div>
       </section>
     </section>
@@ -1128,6 +1128,13 @@
     });
 
     activateSection(location.hash.replace("#", ""));
+
+    const isFilePage = location.protocol === "file:";
+    const dashboardBase = isFilePage ? "" : "/output/study-dashboard/";
+    document.querySelectorAll(".doc-link").forEach((link) => {
+      const key = link.dataset.doc;
+      link.href = `${dashboardBase}document-center${isFilePage ? ".html" : ""}#${key}`;
+    });
 
     document.querySelectorAll("[data-copy]").forEach((button) => {
       button.addEventListener("click", async () => {

@@ -1,0 +1,18 @@
+.vercel/
+node_modules/
+.env
+.env.*
+
+# Future private working files
+measurements/private/
+private/
+secrets/
+raw-data/
+customer-data/
+property-documents/
+
+# OS/editor noise
+Thumbs.db
+.DS_Store
+*.tmp
+*.log

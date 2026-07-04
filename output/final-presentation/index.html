@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>공인중개사 신화의 Codex 앱 업무 자동화 실험</title>
+  <style>
+    :root {
+      --ink: #17202a;
+      --muted: #5f6b7a;
+      --line: #d8dee7;
+      --bg: #f4f6f8;
+      --surface: #ffffff;
+      --green: #0f766e;
+      --green-soft: #e0f4ef;
+      --blue: #2563eb;
+      --blue-soft: #eaf1ff;
+      --amber: #a35a00;
+      --amber-soft: #fff0d4;
+      --red: #b4232a;
+      --red-soft: #ffe5e8;
+      --violet: #6d28d9;
+      --violet-soft: #eee8ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.45;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .deck {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px 20px 44px;
+    }
+
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .top-nav strong {
+      color: var(--ink);
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .nav-links a {
+      padding: 5px 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .slide {
+      min-height: 660px;
+      margin-bottom: 18px;
+      padding: 34px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      page-break-after: always;
+    }
+
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      margin: 0 0 6px;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    h1,
+    h2 {
+      margin: 0;
+      letter-spacing: 0;
+      line-height: 1.18;
+    }
+
+    h1 {
+      font-size: 36px;
+      max-width: 820px;
+    }
+
+    h2 {
+      font-size: 28px;
+    }
+
+    .slide-no {
+      min-width: 62px;
+      text-align: right;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .lead {
+      max-width: 860px;
+      margin: 0 0 22px;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid.two {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .box {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .box h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .box p,
+    .box li {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .box p {
+      margin: 0;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 19px;
+    }
+
+    li + li {
+      margin-top: 6px;
+    }
+
+    .metric {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .metric-value {
+      margin-top: 8px;
+      font-size: 30px;
+      font-weight: 900;
+      line-height: 1.12;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .tag.green {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .tag.blue {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .tag.amber {
+      background: var(--amber-soft);
+      color: var(--amber);
+    }
+
+    .tag.red {
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .tag.violet {
+      background: var(--violet-soft);
+      color: var(--violet);
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .table th,
+    .table td {
+      padding: 11px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .table th {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .visual {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .visual img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .callout {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border: 1px solid #9bd3c8;
+      border-radius: 8px;
+      background: var(--green-soft);
+      color: #07534d;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .warning {
+      padding: 14px 16px;
+      border: 1px solid #f3c1c7;
+      border-radius: 8px;
+      background: var(--red-soft);
+      color: #7a1520;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 10px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 86px 1fr 100px;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .step strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .step span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer-note {
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    @media (max-width: 900px) {
+      .slide {
+        min-height: auto;
+        padding: 22px;
+      }
+
+      .slide-header,
+      .top-nav {
+        display: block;
+      }
+
+      .slide-no {
+        text-align: left;
+        margin-top: 8px;
+      }
+
+      .grid.two,
+      .grid.three {
+        grid-template-columns: 1fr;
+      }
+
+      .step {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 30px;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .deck {
+        max-width: none;
+        padding: 0;
+      }
+
+      .top-nav {
+        display: none;
+      }
+
+      .slide {
+        min-height: 100vh;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck">
+    <nav class="top-nav">
+      <div><strong>GPTERS 23기 Codex 앱 스터디</strong> · 3분 발표 초안</div>
+      <div class="nav-links">
+        <a href="#s1">1</a>
+        <a href="#s2">2</a>
+        <a href="#s3">3</a>
+        <a href="#s4">4</a>
+        <a href="#s5">5</a>
+        <a href="#s6">6</a>
+      </div>
+    </nav>
+
+    <section class="slide" id="s1">
+      <header class="slide-header">
+        <div>
+          <p class="eyebrow">왜 시작했나</p>
+          <h1>공인중개사 신화의 Codex 앱 업무 자동화 실험</h1>
+        </div>
+        <div class="slide-no">01 / 06</div>
+      </header>
+      <p class="lead">반복되는 매물 브리핑 준비를 Codex 앱으로 구조화해, 고객 설명 초안과 내부 검수 체크리스트를 빠르게 만드는 개인용 에이전트 시스템을 실험합니다.</p>
+      <div class="grid three">
+        <div class="metric">
+          <div class="metric-label">대상 업무</div>
+          <div class="metric-value">매물 브리핑 초안</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">사용 도구</div>
+          <div class="metric-value">Codex 앱</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">현재 상태</div>
+          <div class="metric-value">준비 기간</div>
+        </div>
+      </div>
+      <div class="callout">핵심 가설: Codex는 최종 판단자가 아니라, 공인중개사가 검수하기 쉬운 초안과 체크리스트를 만드는 실무 파트너로 쓸 때 가치가 큽니다.</div>
+    </section>
+
+    <section class="slide" id="s2">
+      <header class="slide-header">
+        <div>
+          <p class="eyebrow">기존 방식</p>
+          <h2>자료는 흩어져 있고, 검수 기준은 머릿속에 있었습니다</h2>
+        </div>
+        <div class="slide-no">02 / 06</div>
+      </header>
+      <div class="grid two">
+        <div class="box">
+          <h3>수작업 흐름</h3>
+          <ul>
+            <li>건축물대장, 등기부, 토지이용계획을 각각 확인</li>
+            <li>실거래가와 주변 시세를 별도로 메모</li>
+            <li>고객 설명 문구와 내부 검수 사항을 직접 분리</li>
+            <li>나중에 사례글을 쓰려면 기억에 의존</li>
+          </ul>
+        </div>
+        <div class="box">
+          <h3>문제점</h3>
+          <ul>
+            <li>반복 업무인데 매번 새로 정리</li>
+            <li>수치와 법적 표현을 놓치면 리스크가 큼</li>
+            <li>업무 시간이 정량 기록되지 않음</li>
+            <li>강의 사례로 재현하기 어려움</li>
+          </ul>
+        </div>
+      </div>
+      <table class="table" style="margin-top: 18px;">
+        <thead>
+          <tr>
+            <th>측정 항목</th>
+            <th>현재 상태</th>
+            <th>다음 증거</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>기존 처리 시간</td>
+            <td><span class="tag amber">실측 전</span></td>
+            <td>Before 실측표 작성</td>
+          </tr>
+          <tr>
+            <td>Codex 적용 시간</td>
+            <td><span class="tag amber">실측 전</span></td>
+            <td>샘플 또는 실제 매물로 After 측정</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="slide" id="s3">
+      <header class="slide-header">
+        <div>
+          <p class="eyebrow">Codex로 바꾼 방식</p>
+          <h2>업무를 입력, 처리, 검수, 기록으로 분해했습니다</h2>
+        </div>
+        <div class="slide-no">03 / 06</div>
+      </header>
+      <div class="visual">
+        <img src="../gpters-case-study/images/workflow-diagram.png" alt="공부서류 기반 매물 브리핑 초안 에이전트 워크플로">
+      </div>
+      <div class="grid three" style="margin-top: 18px;">
+        <div class="box">
+          <h3>Goal-mode</h3>
+          <p>4주 목표와 산출물을 계속 이어가기 위한 장기 맥락으로 사용합니다.</p>
+        </div>
+        <div class="box">
+          <h3>작업지시서</h3>
+          <p>매물 브리핑 에이전트가 필수 입력, 출력 형식, 금지 표현을 따르게 합니다.</p>
+        </div>
+        <div class="box">
+          <h3>증거 장부</h3>
+          <p>명령, 산출물, 시간 측정, 배운 점을 사례글 재료로 누적합니다.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="s4">
+      <header class="slide-header">
+        <div>
+          <p class="eyebrow">만든 시스템</p>
+          <h2>매물 브리핑 에이전트의 최소 구조</h2>
+        </div>
+        <div class="slide-no">04 / 06</div>
+      </header>
+      <div class="timeline">
+        <div class="step">
+          <div class="tag blue">입력</div>
+          <div>
+            <strong>주소, 거래조건, 공부서류, 시세, 현장 메모</strong>
+            <span>필수 입력이 없으면 먼저 질문하도록 지시서에 정의</span>
+          </div>
+          <div class="tag green">준비됨</div>
+        </div>
+        <div class="step">
+          <div class="tag violet">처리</div>
+          <div>
+            <strong>핵심 수치 추출, 누락·충돌 표시, 고객 문구 초안 작성</strong>
+            <span>확인된 사실, 추정, 자료 없음, 추가 확인 필요로 분리</span>
+          </div>
+          <div class="tag green">준비됨</div>
+        </div>
+        <div class="step">
+          <div class="tag amber">검수</div>
+          <div>
+            <strong>원문 공부서류, 권리관계, 광고 표현 최종 확인</strong>
+            <span>AI 결과를 그대로 고객에게 전달하지 않음</span>
+          </div>
+          <div class="tag amber">실측 예정</div>
+        </div>
+        <div class="step">
+          <div class="tag green">기록</div>
+          <div>
+            <strong>Before/After 시간, 시행착오, 배운 점 누적</strong>
+            <span>GPTERS 사례글과 발표 자료로 재사용</span>
+          </div>
+          <div class="tag green">구조 완료</div>
+        </div>
+      </div>
+      <div class="warning" style="margin-top: 18px;">금지 표현: 수익 보장, 권리관계 문제 없음, 법적 검토 완료, 건축물대장 API만으로 확정</div>
+    </section>
+
+    <section class="slide" id="s5">
+      <header class="slide-header">
+        <div>
+          <p class="eyebrow">Before / After</p>
+          <h2>속도보다 중요한 것은 검수 가능한 단축입니다</h2>
+        </div>
+        <div class="slide-no">05 / 06</div>
+      </header>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>항목</th>
+            <th>기존 방식</th>
+            <th>Codex 적용 방식</th>
+            <th>상태</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>자료 확인</td>
+            <td>서류별 수동 확인</td>
+            <td>입력자료 요약과 누락 표시</td>
+            <td><span class="tag amber">실측 예정</span></td>
+          </tr>
+          <tr>
+            <td>초안 작성</td>
+            <td>고객 문구 직접 작성</td>
+            <td>고객 설명 초안 생성 후 수정</td>
+            <td><span class="tag amber">실측 예정</span></td>
+          </tr>
+          <tr>
+            <td>검수</td>
+            <td>경험 기반 체크</td>
+            <td>내부 체크리스트 기준 대조</td>
+            <td><span class="tag blue">구조 준비</span></td>
+          </tr>
+          <tr>
+            <td>사례글 기록</td>
+            <td>나중에 기억으로 작성</td>
+            <td>일일 로그와 증거 장부에 즉시 기록</td>
+            <td><span class="tag green">진행 중</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout">다음 증거: 실제 업무 1건의 기존 방식 처리 시간과 Codex 적용 후 처리 시간을 같은 기준으로 측정합니다.</div>
+    </section>
+
+    <section class="slide" id="s6">
+      <header class="slide-header">
+        <div>
+          <p class="eyebrow">배운 점과 다음 계획</p>
+          <h2>사람은 판단과 검수, Codex는 정리와 초안</h2>
+        </div>
+        <div class="slide-no">06 / 06</div>
+      </header>
+      <div class="grid two">
+        <div class="box">
+          <h3>현재까지 배운 점</h3>
+          <ul>
+            <li>자동화는 업무를 통째로 맡기는 것이 아니라 검수 가능한 단위로 나누는 일입니다.</li>
+            <li>부동산 업무에서는 고객 설명 문구와 내부 검수 메모를 반드시 분리해야 합니다.</li>
+            <li>사례글은 마지막에 쓰는 글이 아니라 매일 남긴 증거를 조립하는 결과물입니다.</li>
+          </ul>
+        </div>
+        <div class="box">
+          <h3>다음 계획</h3>
+          <ul>
+            <li>반복 업무 5개를 실제 업무 기준으로 확정</li>
+            <li>기존 방식 1회 실측</li>
+            <li>Codex 적용 방식 1회 실측</li>
+            <li>Week 2에서 Skill, Plugin, MCP 조합 실험</li>
+          </ul>
+        </div>
+      </div>
+      <div class="visual" style="margin-top: 18px;">
+        <img src="../gpters-case-study/images/evidence-card.png" alt="현재 확보한 증거 카드">
+      </div>
+      <p class="footer-note">작성: 신화 · 기준일: 2026-07-04 · 실측 수치는 Week 1 이후 업데이트 예정</p>
+    </section>
+  </main>
+</body>
+</html>

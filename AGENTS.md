@@ -75,3 +75,10 @@ Vercel 배포가 필요한 작업에서는 Vercel CLI를 사용할 수 있다.
 - 로그인 계정: `sachol`
 - 실행 경로: `C:\Users\pc\AppData\Roaming\npm\vercel.cmd`
 - Node.js: `24.14.0`
+
+## Windows 작업 안정성
+
+- PowerShell 안에서 다시 `powershell.exe`를 호출하는 중첩 실행을 피한다.
+- Codex shell 명령은 가능하면 profile 로딩을 피하고, 짧은 명령을 과도하게 병렬 실행하지 않는다.
+- Windows `R6016 - not enough space for thread data` 팝업이 보이면 `scripts/Check-SystemPressure.ps1`로 프로세스 압박을 먼저 확인한다.
+- 프로세스 종료는 Codex 앱, MCP, Vercel 배포를 중단할 수 있으므로 사용자 확인 없이 강제 종료하지 않는다.

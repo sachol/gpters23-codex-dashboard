@@ -686,6 +686,48 @@
       height: auto;
     }
 
+    .evidence-stack {
+      display: grid;
+      gap: 9px;
+    }
+
+    .evidence-item {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 10px;
+      border: 1.5px solid var(--line);
+      border-radius: 8px;
+      background: #fffdf7;
+      box-shadow: 2px 2px 0 var(--line);
+    }
+
+    .evidence-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border: 1.5px solid var(--line);
+      border-radius: 999px;
+      background: var(--sky);
+      font-size: 16px;
+    }
+
+    .evidence-item strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 13px;
+    }
+
+    .evidence-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
     .table {
       width: 100%;
       border-collapse: collapse;
@@ -915,9 +957,36 @@
 
         <aside class="grid">
           <section class="panel">
-            <h2>현재 확보한 증거</h2>
-            <div class="visual">
-              <img src="../gpters-case-study/images/evidence-card.png" alt="현재 확보한 증거 카드">
+            <h2>현재 확보한 증거 <span class="tooltip" tabindex="0" data-tip="증거는 사례글에 넣을 수 있는 실제 산출물과 검증 기록입니다. 단순 이미지가 아니라 작업 결과의 근거 목록입니다.">?</span></h2>
+            <div class="evidence-stack" aria-label="현재 확보한 증거 목록">
+              <div class="evidence-item">
+                <span class="evidence-icon">📊</span>
+                <div>
+                  <strong>학습 대시보드</strong>
+                  <span>4주 계획, 자동화 후보, 주차별 루틴을 시각화한 운영판</span>
+                </div>
+              </div>
+              <div class="evidence-item">
+                <span class="evidence-icon">📚</span>
+                <div>
+                  <strong>HTML 문서센터</strong>
+                  <span>주요 문서를 Markdown 대신 읽기 쉬운 카드형 HTML로 정리</span>
+                </div>
+              </div>
+              <div class="evidence-item">
+                <span class="evidence-icon">🔗</span>
+                <div>
+                  <strong>GitHub/Vercel 배포 기록</strong>
+                  <span>작업 이력, 공개 URL, 재배포 과정을 사례 근거로 활용</span>
+                </div>
+              </div>
+              <div class="evidence-item">
+                <span class="evidence-icon">🛠️</span>
+                <div>
+                  <strong>시스템 점검 기록</strong>
+                  <span>R6016 팝업 원인 분석과 대응 문서, 점검 스크립트</span>
+                </div>
+              </div>
             </div>
           </section>
           <section class="panel">

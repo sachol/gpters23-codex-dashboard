@@ -3,24 +3,74 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
   <title>문서센터 | 도시아재 GPTERS 23기 Codex 앱 스터디</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <script>
+    (() => {
+      try {
+        const savedTheme = localStorage.getItem("gpters23-theme");
+        const preferredTheme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.dataset.theme = savedTheme || preferredTheme;
+      } catch {
+        document.documentElement.dataset.theme = "light";
+      }
+    })();
+  </script>
   <style>
     :root {
-      --ink: #17202a;
-      --muted: #647084;
-      --line: #1e293b;
-      --bg: #f4f1e8;
+      color-scheme: light;
+      --ink: #15202b;
+      --muted: #526275;
+      --line: #344256;
+      --bg: #edf2f4;
       --surface: #ffffff;
-      --paper: #fffaf0;
-      --mint: #dff8ed;
+      --paper: #ffffff;
+      --surface-soft: #f7f9fb;
+      --border-soft: #c8d2dc;
+      --grid-color: rgba(52, 66, 86, 0.055);
+      --strong-bg: #15202b;
+      --strong-ink: #ffffff;
+      --mint: #dcfce7;
+      --mint-ink: #065f46;
       --sky: #dbeafe;
-      --peach: #ffead5;
+      --sky-ink: #1d4ed8;
+      --peach: #ffedd5;
       --rose: #ffe4e6;
+      --rose-ink: #881337;
       --green: #0f766e;
       --blue: #2563eb;
-      --shadow: 4px 4px 0 #1e293b;
+      --shadow: 0 10px 28px rgba(15, 23, 42, 0.1);
+      --shadow-soft: 0 5px 16px rgba(15, 23, 42, 0.08);
+      --shadow-hover: 0 10px 24px rgba(15, 23, 42, 0.14);
+    }
+
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --ink: #eef3f8;
+      --muted: #b3c0cf;
+      --line: #64748b;
+      --bg: #09111d;
+      --surface: #131e2e;
+      --paper: #101927;
+      --surface-soft: #182436;
+      --border-soft: #425169;
+      --grid-color: rgba(148, 163, 184, 0.07);
+      --strong-bg: #e5edf5;
+      --strong-ink: #0b1320;
+      --mint: #143c34;
+      --mint-ink: #a7f3d0;
+      --sky: #182f50;
+      --sky-ink: #bfdbfe;
+      --peach: #4b2d1d;
+      --rose: #4a202a;
+      --rose-ink: #fecdd3;
+      --green: #5eead4;
+      --blue: #93c5fd;
+      --shadow: 0 14px 34px rgba(0, 0, 0, 0.32);
+      --shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.24);
+      --shadow-hover: 0 12px 28px rgba(0, 0, 0, 0.34);
     }
 
     * {
@@ -32,11 +82,12 @@
       font-family: "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
       color: var(--ink);
       background:
-        linear-gradient(90deg, rgba(30, 41, 59, 0.035) 1px, transparent 1px),
-        linear-gradient(rgba(30, 41, 59, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px),
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
         var(--bg);
       background-size: 28px 28px;
-      line-height: 1.6;
+      font-size: 16px;
+      line-height: 1.68;
     }
 
     a {
@@ -46,6 +97,12 @@
 
     button {
       font: inherit;
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid var(--blue);
+      outline-offset: 3px;
     }
 
     .shell {
@@ -91,15 +148,15 @@
       border: 1.5px solid var(--line);
       border-radius: 999px;
       background: var(--mint);
-      color: #064e3b;
-      font-size: 12px;
+      color: var(--mint-ink);
+      font-size: 13px;
       font-weight: 900;
       line-height: 1;
     }
 
     .badge.sky {
       background: var(--sky);
-      color: #1d4ed8;
+      color: var(--sky-ink);
     }
 
     h1 {
@@ -112,23 +169,53 @@
     .subtitle {
       max-width: 780px;
       margin: 10px 0 0;
-      color: #334155;
-      font-size: 15px;
+      color: var(--muted);
+      font-size: 16px;
       font-weight: 650;
     }
 
-    .back-link {
+    .hero-tools {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .back-link,
+    .theme-button {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
+      gap: 7px;
       min-height: 38px;
       padding: 8px 12px;
       border: 1.5px solid var(--line);
       border-radius: 8px;
       background: var(--surface);
-      box-shadow: 2px 2px 0 var(--line);
+      box-shadow: var(--shadow-soft);
+      color: var(--ink);
+      cursor: pointer;
       font-size: 13px;
       font-weight: 900;
       white-space: nowrap;
+    }
+
+    .back-link:hover,
+    .theme-button:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .theme-icon {
+      display: inline-flex;
+      width: 20px;
+      height: 20px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: var(--sky);
+      color: var(--sky-ink);
+      font-weight: 950;
     }
 
     .layout {
@@ -142,7 +229,7 @@
       position: sticky;
       top: 14px;
       padding: 14px;
-      background: #fffdf7;
+      background: var(--surface-soft);
     }
 
     .nav-title {
@@ -166,8 +253,8 @@
       padding: 9px;
       border: 1.5px solid var(--line);
       border-radius: 8px;
-      background: #fff;
-      box-shadow: 2px 2px 0 var(--line);
+      background: var(--surface);
+      box-shadow: var(--shadow-soft);
       color: var(--ink);
       cursor: pointer;
       text-align: left;
@@ -176,9 +263,9 @@
     .doc-button:hover,
     .doc-button.active {
       transform: translate(-1px, -1px);
-      background: var(--ink);
-      color: #fff;
-      box-shadow: 3px 3px 0 var(--line);
+      background: var(--strong-bg);
+      color: var(--strong-ink);
+      box-shadow: var(--shadow-hover);
     }
 
     .doc-button .emoji {
@@ -194,12 +281,12 @@
 
     .doc-button.active .emoji,
     .doc-button:hover .emoji {
-      background: #fff;
+      background: var(--surface);
     }
 
     .doc-button strong {
       display: block;
-      font-size: 13px;
+      font-size: 14px;
       line-height: 1.25;
     }
 
@@ -207,19 +294,20 @@
       display: block;
       margin-top: 2px;
       color: var(--muted);
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 700;
     }
 
     .doc-button.active span:not(.emoji),
     .doc-button:hover span:not(.emoji) {
-      color: #dbeafe;
+      color: var(--strong-ink);
+      opacity: 0.78;
     }
 
     .doc {
       min-height: 620px;
       padding: 22px;
-      background: #fff;
+      background: var(--surface);
     }
 
     .doc-header {
@@ -227,7 +315,7 @@
       gap: 8px;
       margin-bottom: 16px;
       padding-bottom: 14px;
-      border-bottom: 1.5px solid #d4d9e2;
+      border-bottom: 1.5px solid var(--border-soft);
     }
 
     .doc-kicker {
@@ -247,7 +335,7 @@
       max-width: 760px;
       margin: 0;
       color: var(--muted);
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 650;
     }
 
@@ -259,8 +347,8 @@
 
     .info-card {
       padding: 13px;
-      background: #fffdf7;
-      box-shadow: 2px 2px 0 var(--line);
+      background: var(--surface-soft);
+      box-shadow: var(--shadow-soft);
     }
 
     .info-card strong {
@@ -272,7 +360,7 @@
     .info-card p,
     .info-card li {
       color: var(--muted);
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 650;
     }
 
@@ -290,15 +378,15 @@
       margin-top: 14px;
       padding: 14px;
       background: var(--mint);
-      box-shadow: 2px 2px 0 var(--line);
-      color: #064e3b;
-      font-size: 13px;
+      box-shadow: var(--shadow-soft);
+      color: var(--mint-ink);
+      font-size: 14px;
       font-weight: 800;
     }
 
     .callout.warn {
       background: var(--rose);
-      color: #7f1d1d;
+      color: var(--rose-ink);
     }
 
     .action-row {
@@ -316,27 +404,27 @@
       border: 1.5px solid var(--line);
       border-radius: 8px;
       background: var(--sky);
-      box-shadow: 2px 2px 0 var(--line);
-      color: #1d4ed8;
-      font-size: 12px;
+      box-shadow: var(--shadow-soft);
+      color: var(--sky-ink);
+      font-size: 13px;
       font-weight: 950;
     }
 
     .action-link.secondary {
-      background: #fff;
+      background: var(--surface);
       color: var(--ink);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 13px;
+      font-size: 14px;
     }
 
     th,
     td {
       padding: 9px;
-      border-bottom: 1px solid #d4d9e2;
+      border-bottom: 1px solid var(--border-soft);
       text-align: left;
       vertical-align: top;
     }
@@ -361,8 +449,38 @@
         position: static;
       }
 
+      .hero-tools {
+        justify-content: flex-start;
+      }
+
       h1 {
         font-size: 27px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .shell {
+        padding-inline: 12px;
+      }
+
+      .hero,
+      .doc,
+      .nav-card {
+        padding: 16px;
+      }
+
+      .hero-tools {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .back-link,
+      .theme-button {
+        width: 100%;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -378,7 +496,13 @@
         <h1>GPTERS 23기 Codex 앱 스터디 문서센터</h1>
         <p class="subtitle">대시보드의 주요 문서를 Markdown 원문이 아니라 발표와 공유에 적합한 HTML 카드 형태로 읽습니다.</p>
       </div>
-      <a class="back-link" id="backLink" href="index.html#artifacts">← 대시보드로 돌아가기</a>
+      <div class="hero-tools" aria-label="문서센터 도구">
+        <button class="theme-button" id="themeToggle" type="button" title="화면 테마를 전환합니다.">
+          <span class="theme-icon" id="themeIcon" aria-hidden="true">☾</span>
+          <span id="themeLabel">다크 모드</span>
+        </button>
+        <a class="back-link" id="backLink" href="index.html#artifacts">← 대시보드로 돌아가기</a>
+      </div>
     </header>
 
     <section class="layout">
@@ -392,6 +516,32 @@
   </main>
 
   <script>
+    const themeStorageKey = "gpters23-theme";
+    const themeToggle = document.getElementById("themeToggle");
+    const themeIcon = document.getElementById("themeIcon");
+    const themeLabel = document.getElementById("themeLabel");
+
+    function syncThemeButton() {
+      const isDark = document.documentElement.dataset.theme === "dark";
+      themeIcon.textContent = isDark ? "☀" : "☾";
+      themeLabel.textContent = isDark ? "라이트 모드" : "다크 모드";
+      themeToggle.setAttribute("aria-label", isDark ? "라이트 모드로 전환" : "다크 모드로 전환");
+      themeToggle.setAttribute("aria-pressed", String(isDark));
+    }
+
+    themeToggle.addEventListener("click", () => {
+      const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = nextTheme;
+      try {
+        localStorage.setItem(themeStorageKey, nextTheme);
+      } catch {
+        // The selected theme still applies for the current page.
+      }
+      syncThemeButton();
+    });
+
+    syncThemeButton();
+
     const documents = {
       "week1-assignment": {
         emoji: "📝",

@@ -1883,7 +1883,7 @@
       <section class="panel" style="margin-top:14px">
         <h2>에이전트 처리 흐름</h2>
         <div class="visual">
-          <img src="../gpters-case-study/images/workflow-diagram.png" alt="공부서류 기반 매물 브리핑 초안 에이전트 워크플로">
+          <img src="/output/gpters-case-study/images/workflow-diagram.png" data-file-src="../gpters-case-study/images/workflow-diagram.png" alt="공부서류 기반 매물 브리핑 초안 에이전트 워크플로">
         </div>
       </section>
     </section>
@@ -1946,7 +1946,7 @@
           <a class="item doc-link" href="document-center.html#automation-menu" data-doc="automation-menu"><strong>🧭 자동화 후보</strong><span>중개·경매·AI 교육</span></a>
           <a class="item doc-link" href="document-center.html#benchmark" data-doc="benchmark"><strong>🔎 벤치마킹 메모</strong><span>이전 기수 장점 반영</span></a>
           <a class="item doc-link" href="document-center.html#system-check" data-doc="system-check"><strong>🛠️ 시스템 점검</strong><span>R6016 팝업 대응</span></a>
-          <a class="item" href="../gpters-case-study/images/goal-alignment-board.png"><strong>🖼️ 정렬 상태 이미지</strong><span>한눈에 보기</span></a>
+          <a class="item" href="/output/gpters-case-study/images/goal-alignment-board.png" data-file-href="../gpters-case-study/images/goal-alignment-board.png"><strong>🖼️ 정렬 상태 이미지</strong><span>한눈에 보기</span></a>
           <a class="item doc-link" href="document-center.html#context" data-doc="context"><strong>🧩 컨텍스트 인계</strong><span>압축 후 이어가기</span></a>
         </div>
       </section>
@@ -2101,6 +2101,14 @@
 
     const isFilePage = location.protocol === "file:";
     const dashboardBase = isFilePage ? "" : "/output/study-dashboard/";
+    if (isFilePage) {
+      document.querySelectorAll("[data-file-src]").forEach((asset) => {
+        asset.src = asset.dataset.fileSrc;
+      });
+      document.querySelectorAll("[data-file-href]").forEach((link) => {
+        link.href = link.dataset.fileHref;
+      });
+    }
     document.querySelectorAll(".doc-link").forEach((link) => {
       const key = link.dataset.doc;
       link.href = `${dashboardBase}document-center${isFilePage ? ".html" : ""}#${key}`;

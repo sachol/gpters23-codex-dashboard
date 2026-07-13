@@ -902,6 +902,20 @@
       .arch-arrow {
         transform: rotate(90deg);
       }
+
+      .tooltip::after {
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        left: 16px;
+        width: auto;
+        transform: translateY(6px);
+      }
+
+      .tooltip:hover::after,
+      .tooltip:focus::after {
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
@@ -915,7 +929,7 @@
           <span class="badge peach">Codex App</span>
         </p>
         <h1>처음 만나는 코덱스 앱으로 신기능 하나씩 내 업무에 붙이기</h1>
-        <p class="subtitle">첫주는 미니사례로 계획을 확정하고, 2~4주는 매주 수요일 전까지 실제 중개업무 자동화 사례를 1개 이상 준비해 발표 자료로 누적합니다.</p>
+        <p class="subtitle">첫주는 미니사례로 계획을 확정하고, 2~4주는 매주 수요일 전까지 실제 부동산·AI 교육 업무 자동화 사례를 1개 이상 준비해 발표 자료로 누적합니다.</p>
       </div>
       <aside class="hero-side" aria-label="프로젝트 요약">
         <div class="owner">

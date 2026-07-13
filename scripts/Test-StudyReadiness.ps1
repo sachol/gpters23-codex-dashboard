@@ -25,6 +25,7 @@ $requiredFiles = @(
     "output/week1-submission/quick-reply-template.md",
     "output/week1-submission/repeated-work-summary.md",
     "output/study-dashboard/index.html",
+    "output/study-dashboard/document-center.html",
     "output/final-presentation/index.html",
     "output/gpters-case-study/post.md",
     "scripts/New-DailyLog.ps1",
@@ -34,11 +35,10 @@ $requiredFiles = @(
 )
 
 $manualInputs = @(
-    "Recent repeated work items: 5 entries",
-    "Estimated or measured time for each repeated work item",
+    "Estimated time and monthly frequency for the selected candidates",
     "One before-measurement run for the selected task",
     "One after-measurement run using Codex",
-    "Final Week 1 topic confirmation by ShinHwa"
+    "Final Week 1 topic confirmation by the representative"
 )
 
 $missing = @()

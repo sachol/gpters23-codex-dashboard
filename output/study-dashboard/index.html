@@ -3,28 +3,88 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
   <title>처음 만나는 코덱스 앱으로 신기능 하나씩 내 업무에 붙이기 | 도시아재</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <script>
+    (() => {
+      try {
+        const savedTheme = localStorage.getItem("gpters23-theme");
+        const preferredTheme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.dataset.theme = savedTheme || preferredTheme;
+      } catch {
+        document.documentElement.dataset.theme = "light";
+      }
+    })();
+  </script>
   <style>
     :root {
-      --ink: #17202a;
-      --muted: #647084;
-      --line: #1e293b;
+      color-scheme: light;
+      --ink: #15202b;
+      --muted: #526275;
+      --line: #344256;
       --surface: #ffffff;
-      --paper: #fffaf0;
-      --bg: #f4f1e8;
-      --cream: #fff7df;
-      --mint: #dff8ed;
+      --paper: #ffffff;
+      --bg: #edf2f4;
+      --surface-soft: #f7f9fb;
+      --surface-muted: #e8eef3;
+      --surface-selected: #ecfdf5;
+      --border-soft: #c8d2dc;
+      --tabs-bg: rgba(237, 242, 244, 0.9);
+      --grid-color: rgba(52, 66, 86, 0.055);
+      --strong-bg: #15202b;
+      --strong-ink: #ffffff;
+      --mint: #dcfce7;
+      --mint-ink: #065f46;
       --sky: #dbeafe;
-      --peach: #ffead5;
+      --sky-ink: #1d4ed8;
+      --peach: #ffedd5;
+      --peach-ink: #9a3412;
       --rose: #ffe4e6;
+      --rose-ink: #881337;
       --green: #0f766e;
       --blue: #2563eb;
       --amber: #b45309;
       --red: #b91c1c;
-      --shadow: 5px 5px 0 #1e293b;
-      --shadow-soft: 3px 3px 0 #1e293b;
+      --watermark: rgba(21, 32, 43, 0.045);
+      --shadow: 0 14px 36px rgba(15, 23, 42, 0.1);
+      --shadow-soft: 0 5px 16px rgba(15, 23, 42, 0.08);
+      --shadow-hover: 0 10px 24px rgba(15, 23, 42, 0.14);
+    }
+
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --ink: #eef3f8;
+      --muted: #b3c0cf;
+      --line: #64748b;
+      --surface: #131e2e;
+      --paper: #101927;
+      --bg: #09111d;
+      --surface-soft: #182436;
+      --surface-muted: #243247;
+      --surface-selected: #123b35;
+      --border-soft: #425169;
+      --tabs-bg: rgba(9, 17, 29, 0.9);
+      --grid-color: rgba(148, 163, 184, 0.07);
+      --strong-bg: #e5edf5;
+      --strong-ink: #0b1320;
+      --mint: #143c34;
+      --mint-ink: #a7f3d0;
+      --sky: #182f50;
+      --sky-ink: #bfdbfe;
+      --peach: #4b2d1d;
+      --peach-ink: #fed7aa;
+      --rose: #4a202a;
+      --rose-ink: #fecdd3;
+      --green: #5eead4;
+      --blue: #93c5fd;
+      --amber: #fdba74;
+      --red: #fca5a5;
+      --watermark: rgba(226, 232, 240, 0.04);
+      --shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+      --shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.24);
+      --shadow-hover: 0 12px 28px rgba(0, 0, 0, 0.34);
     }
 
     * {
@@ -40,11 +100,13 @@
       font-family: "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
       color: var(--ink);
       background:
-        linear-gradient(90deg, rgba(30, 41, 59, 0.035) 1px, transparent 1px),
-        linear-gradient(rgba(30, 41, 59, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px),
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
         var(--bg);
       background-size: 28px 28px;
-      line-height: 1.55;
+      font-size: 16px;
+      line-height: 1.65;
+      transition: color 160ms ease, background-color 160ms ease;
     }
 
     button,
@@ -55,6 +117,15 @@
     a {
       color: inherit;
       text-decoration: none;
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    select:focus-visible,
+    input:focus-visible,
+    [tabindex]:focus-visible {
+      outline: 3px solid var(--blue);
+      outline-offset: 3px;
     }
 
     .shell {
@@ -83,7 +154,7 @@
       position: absolute;
       right: 18px;
       bottom: -8px;
-      color: rgba(30, 41, 59, 0.06);
+      color: var(--watermark);
       font-size: 76px;
       font-weight: 950;
       letter-spacing: 0;
@@ -99,6 +170,69 @@
       color: var(--green);
       font-size: 13px;
       font-weight: 900;
+    }
+
+    .hero-topline {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .hero-topline .eyebrow {
+      margin-bottom: 0;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .utility-button,
+    .dialog-close,
+    .guide-primary,
+    .guide-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 38px;
+      padding: 8px 11px;
+      border: 1.5px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--ink);
+      box-shadow: var(--shadow-soft);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .utility-button:hover,
+    .dialog-close:hover,
+    .guide-primary:hover,
+    .guide-secondary:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .utility-icon {
+      display: inline-flex;
+      width: 20px;
+      height: 20px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: var(--sky);
+      color: var(--sky-ink);
+      font-size: 13px;
+      font-weight: 950;
     }
 
     .badge,
@@ -121,17 +255,17 @@
 
     .badge.mint {
       background: var(--mint);
-      color: #064e3b;
+      color: var(--mint-ink);
     }
 
     .badge.sky {
       background: var(--sky);
-      color: #1d4ed8;
+      color: var(--sky-ink);
     }
 
     .badge.peach {
       background: var(--peach);
-      color: #9a3412;
+      color: var(--peach-ink);
     }
 
     h1 {
@@ -145,8 +279,8 @@
     .subtitle {
       margin: 12px 0 0;
       max-width: 780px;
-      color: #334155;
-      font-size: 16px;
+      color: var(--muted);
+      font-size: 17px;
       font-weight: 600;
     }
 
@@ -159,7 +293,7 @@
       padding: 16px;
       border: 2px solid var(--line);
       border-radius: 8px;
-      background: #fff;
+      background: var(--surface);
       box-shadow: var(--shadow-soft);
     }
 
@@ -198,7 +332,7 @@
       height: 13px;
       border: 1.5px solid var(--line);
       border-radius: 999px;
-      background: #edf2f7;
+      background: var(--surface-muted);
       overflow: hidden;
     }
 
@@ -219,7 +353,7 @@
       margin: 0 0 16px;
       padding: 10px 0;
       list-style: none;
-      background: rgba(244, 241, 232, 0.88);
+      background: var(--tabs-bg);
       backdrop-filter: blur(10px);
     }
 
@@ -230,18 +364,18 @@
       border-radius: 8px;
       background: var(--surface);
       color: var(--ink);
-      box-shadow: 2px 2px 0 var(--line);
+      box-shadow: var(--shadow-soft);
       cursor: pointer;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 900;
     }
 
     .tabs button:hover,
     .tabs button.active {
       transform: translate(-1px, -1px);
-      background: var(--ink);
-      color: #fff;
-      box-shadow: 3px 3px 0 var(--line);
+      background: var(--strong-bg);
+      color: var(--strong-ink);
+      box-shadow: var(--shadow-hover);
     }
 
     .dashboard-section {
@@ -283,7 +417,7 @@
       border: 1.5px solid var(--line);
       border-radius: 8px;
       background: var(--surface);
-      box-shadow: 2px 2px 0 var(--line);
+      box-shadow: var(--shadow-soft);
     }
 
     .metric {
@@ -293,7 +427,7 @@
 
     .metric-label {
       color: var(--muted);
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 850;
     }
 
@@ -307,7 +441,7 @@
     .metric-note {
       margin-top: 8px;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 650;
     }
 
@@ -317,7 +451,7 @@
 
     .panel h2 {
       margin: 0 0 12px;
-      font-size: 19px;
+      font-size: 20px;
       letter-spacing: 0;
     }
 
@@ -341,18 +475,18 @@
       gap: 12px;
       align-items: center;
       padding: 12px;
-      background: #fffdf7;
+      background: var(--surface-soft);
     }
 
     .stage strong {
       display: block;
       margin-bottom: 2px;
-      font-size: 14px;
+      font-size: 15px;
     }
 
     .stage span {
       color: var(--muted);
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 650;
     }
 
@@ -371,7 +505,7 @@
 
     .tag.done {
       background: var(--mint);
-      color: #064e3b;
+      color: var(--mint-ink);
     }
 
     .tag.progress {
@@ -380,8 +514,8 @@
     }
 
     .tag.wait {
-      background: #eef2f7;
-      color: #475569;
+      background: var(--surface-muted);
+      color: var(--muted);
     }
 
     .next-actions li {
@@ -390,8 +524,8 @@
       gap: 10px;
       align-items: start;
       padding: 10px;
-      background: #fffdf7;
-      font-size: 13px;
+      background: var(--surface-soft);
+      font-size: 14px;
       font-weight: 650;
     }
 
@@ -449,13 +583,13 @@
       position: relative;
       padding: 14px;
       min-height: 170px;
-      background: #fffdf7;
+      background: var(--surface-soft);
       transition: transform 140ms ease, box-shadow 140ms ease;
     }
 
     .candidate-card.selected {
-      background: #f0fdf4;
-      box-shadow: 4px 4px 0 var(--line);
+      background: var(--surface-selected);
+      box-shadow: 0 0 0 2px var(--green), var(--shadow-soft);
     }
 
     .candidate-head {
@@ -473,7 +607,7 @@
       padding: 5px 8px;
       border: 1.5px solid var(--line);
       border-radius: 999px;
-      background: #fff;
+      background: var(--surface);
       color: var(--ink);
       cursor: pointer;
       font-size: 12px;
@@ -501,11 +635,11 @@
       align-items: center;
       min-height: 25px;
       padding: 4px 8px;
-      border: 1.5px solid #cbd5e1;
+      border: 1.5px solid var(--border-soft);
       border-radius: 999px;
-      background: #fff;
-      color: #475569;
-      font-size: 11px;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 12px;
       font-weight: 850;
     }
 
@@ -514,8 +648,8 @@
       padding: 13px;
       border: 1.5px solid var(--line);
       border-radius: 8px;
-      background: #fffdf7;
-      box-shadow: 2px 2px 0 var(--line);
+      background: var(--surface-soft);
+      box-shadow: var(--shadow-soft);
     }
 
     .summary-card strong {
@@ -526,7 +660,7 @@
 
     .summary-card p {
       color: var(--muted);
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 650;
     }
 
@@ -537,10 +671,10 @@
       padding: 6px 8px;
       border: 1.5px solid var(--line);
       border-radius: 8px;
-      background: #fff;
+      background: var(--surface);
       color: var(--ink);
       font: inherit;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 850;
     }
 
@@ -549,7 +683,7 @@
     .benchmark-item:hover,
     .item:hover {
       transform: translate(-2px, -2px);
-      box-shadow: 4px 4px 0 var(--line);
+      box-shadow: var(--shadow-hover);
     }
 
     .candidate-card strong,
@@ -557,7 +691,7 @@
     .benchmark-item strong {
       display: block;
       margin: 9px 0 6px;
-      font-size: 15px;
+      font-size: 16px;
       line-height: 1.35;
     }
 
@@ -565,7 +699,7 @@
     .routine-card p,
     .benchmark-item span {
       color: var(--muted);
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 650;
     }
 
@@ -596,10 +730,10 @@
       padding: 9px 10px;
       border: 1.5px solid var(--line);
       border-radius: 8px;
-      background: var(--ink);
-      color: #fff;
-      box-shadow: 3px 3px 0 rgba(30, 41, 59, 0.25);
-      font-size: 12px;
+      background: var(--strong-bg);
+      color: var(--strong-ink);
+      box-shadow: var(--shadow-hover);
+      font-size: 13px;
       font-weight: 650;
       line-height: 1.45;
       opacity: 0;
@@ -625,7 +759,7 @@
     .arch-node {
       min-height: 104px;
       padding: 12px;
-      background: #fffdf7;
+      background: var(--surface-soft);
     }
 
     .arch-node strong {
@@ -637,7 +771,7 @@
     .arch-node span {
       display: block;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 650;
     }
 
@@ -652,7 +786,7 @@
       gap: 7px;
       margin-top: 12px;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 750;
     }
 
@@ -667,7 +801,7 @@
       height: 10px;
       border: 1.5px solid var(--line);
       border-radius: 999px;
-      background: #e5e7eb;
+      background: var(--surface-muted);
       overflow: hidden;
     }
 
@@ -682,10 +816,10 @@
       padding: 12px;
       border: 1.5px solid var(--line);
       border-radius: 8px;
-      background: #fffdf7;
+      background: var(--surface-soft);
       white-space: pre-wrap;
       font-family: "Pretendard", "Malgun Gothic", system-ui, sans-serif;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 650;
     }
 
@@ -703,23 +837,23 @@
       border: 1.5px solid var(--line);
       border-radius: 8px;
       background: var(--mint);
-      box-shadow: 2px 2px 0 var(--line);
+      box-shadow: var(--shadow-soft);
       cursor: pointer;
-      color: #064e3b;
-      font-size: 12px;
+      color: var(--mint-ink);
+      font-size: 13px;
       font-weight: 950;
     }
 
     .copy-button:hover {
       transform: translate(-1px, -1px);
-      box-shadow: 3px 3px 0 var(--line);
+      box-shadow: var(--shadow-hover);
     }
 
     .plan-do {
       display: grid;
       gap: 7px;
       margin-top: 10px;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 650;
     }
 
@@ -736,21 +870,21 @@
 
     details {
       margin-top: 12px;
-      border-top: 1.5px dashed #94a3b8;
+      border-top: 1.5px dashed var(--border-soft);
       padding-top: 10px;
     }
 
     summary {
       cursor: pointer;
       color: var(--blue);
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 900;
     }
 
     details p {
       margin-top: 8px;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 650;
     }
 
@@ -768,7 +902,7 @@
 
     .item span {
       color: var(--muted);
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 650;
     }
 
@@ -776,9 +910,9 @@
       width: 100%;
       border: 1.5px solid var(--line);
       border-radius: 8px;
-      background: #fff;
+      background: var(--surface);
       overflow: hidden;
-      box-shadow: 2px 2px 0 var(--line);
+      box-shadow: var(--shadow-soft);
     }
 
     .visual img {
@@ -800,8 +934,8 @@
       padding: 10px;
       border: 1.5px solid var(--line);
       border-radius: 8px;
-      background: #fffdf7;
-      box-shadow: 2px 2px 0 var(--line);
+      background: var(--surface-soft);
+      box-shadow: var(--shadow-soft);
     }
 
     .evidence-icon {
@@ -825,27 +959,27 @@
     .evidence-item span {
       display: block;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 650;
     }
 
     .table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 13px;
+      font-size: 14px;
     }
 
     .table th,
     .table td {
       padding: 10px 9px;
-      border-bottom: 1.5px solid #d4d9e2;
+      border-bottom: 1.5px solid var(--border-soft);
       text-align: left;
       vertical-align: top;
     }
 
     .table th {
       color: var(--muted);
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 900;
     }
 
@@ -854,9 +988,9 @@
       border: 1.5px solid var(--line);
       border-radius: 8px;
       background: var(--rose);
-      color: #75151c;
-      box-shadow: 2px 2px 0 var(--line);
-      font-size: 13px;
+      color: var(--rose-ink);
+      box-shadow: var(--shadow-soft);
+      font-size: 14px;
       font-weight: 750;
     }
 
@@ -866,6 +1000,172 @@
       font-size: 12px;
       font-weight: 750;
       text-align: right;
+    }
+
+    .guide-dialog {
+      width: min(920px, calc(100vw - 32px));
+      max-height: min(88vh, 900px);
+      margin: auto;
+      padding: 0;
+      border: 1.5px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--ink);
+      box-shadow: var(--shadow);
+      overflow: auto;
+    }
+
+    .guide-dialog::backdrop {
+      background: rgba(3, 10, 20, 0.68);
+      backdrop-filter: blur(4px);
+    }
+
+    .guide-header {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      padding: 22px 24px;
+      border-bottom: 1px solid var(--border-soft);
+      background: var(--paper);
+    }
+
+    .guide-kicker {
+      margin: 0 0 6px;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .guide-header h2 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.25;
+    }
+
+    .guide-lead {
+      max-width: 700px;
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .dialog-close {
+      flex: 0 0 38px;
+      width: 38px;
+      padding: 0;
+      font-size: 22px;
+    }
+
+    .guide-body {
+      padding: 0 24px 24px;
+    }
+
+    .guide-section {
+      padding: 22px 0;
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .guide-section:last-of-type {
+      border-bottom: 0;
+    }
+
+    .guide-section h3 {
+      margin: 0 0 10px;
+      font-size: 19px;
+    }
+
+    .guide-section p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .guide-audience,
+    .guide-menu-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0 24px;
+    }
+
+    .guide-audience > div,
+    .guide-menu-row {
+      padding: 12px 0;
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .guide-audience strong,
+    .guide-menu-row strong,
+    .guide-flow-step strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 15px;
+    }
+
+    .guide-flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-top: 14px;
+      border-top: 1px solid var(--border-soft);
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .guide-flow-step {
+      min-height: 150px;
+      padding: 16px;
+      border-left: 1px solid var(--border-soft);
+    }
+
+    .guide-flow-step:first-child {
+      border-left: 0;
+    }
+
+    .guide-flow-step span {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .guide-principle {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--green);
+      background: var(--mint);
+      color: var(--mint-ink);
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .guide-actions {
+      position: sticky;
+      bottom: 0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-soft);
+      background: var(--paper);
+    }
+
+    .guide-primary {
+      background: var(--strong-bg);
+      color: var(--strong-ink);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
     }
 
     @media (max-width: 980px) {
@@ -903,6 +1203,32 @@
         transform: rotate(90deg);
       }
 
+      .hero-topline {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .hero-actions {
+        justify-content: flex-start;
+      }
+
+      .guide-audience,
+      .guide-menu-grid,
+      .guide-flow {
+        grid-template-columns: 1fr;
+      }
+
+      .guide-flow-step,
+      .guide-flow-step:first-child {
+        min-height: 0;
+        border-left: 0;
+        border-top: 1px solid var(--border-soft);
+      }
+
+      .guide-flow-step:first-child {
+        border-top: 0;
+      }
+
       .tooltip::after {
         position: fixed;
         right: 16px;
@@ -917,17 +1243,69 @@
         transform: translateY(0);
       }
     }
+
+    @media (max-width: 560px) {
+      .shell {
+        padding-inline: 12px;
+      }
+
+      .hero,
+      .panel,
+      .metric {
+        padding: 16px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      .subtitle {
+        font-size: 15px;
+      }
+
+      .utility-button {
+        flex: 1 1 150px;
+      }
+
+      .guide-header,
+      .guide-body,
+      .guide-actions {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .guide-header h2 {
+        font-size: 23px;
+      }
+
+      .guide-actions {
+        align-items: stretch;
+        flex-direction: column-reverse;
+      }
+    }
   </style>
 </head>
 <body>
   <main class="shell">
     <header class="hero">
       <div>
-        <p class="eyebrow">
-          <span class="badge mint">도시아재</span>
-          <span class="badge sky">GPTERS 23기</span>
-          <span class="badge peach">Codex App</span>
-        </p>
+        <div class="hero-topline">
+          <p class="eyebrow">
+            <span class="badge mint">도시아재</span>
+            <span class="badge sky">GPTERS 23기</span>
+            <span class="badge peach">Codex App</span>
+          </p>
+          <div class="hero-actions" aria-label="대시보드 도구">
+            <button class="utility-button" id="guideButton" type="button" aria-haspopup="dialog" aria-controls="dashboardGuide" title="대시보드의 목적과 4주 운영 흐름을 봅니다.">
+              <span class="utility-icon" aria-hidden="true">i</span>
+              <span>대시보드 안내</span>
+            </button>
+            <button class="utility-button" id="themeToggle" type="button" title="화면 테마를 전환합니다.">
+              <span class="utility-icon" id="themeIcon" aria-hidden="true">☾</span>
+              <span id="themeLabel">다크 모드</span>
+            </button>
+          </div>
+        </div>
         <h1>처음 만나는 코덱스 앱으로 신기능 하나씩 내 업무에 붙이기</h1>
         <p class="subtitle">첫주는 미니사례로 계획을 확정하고, 2~4주는 매주 수요일 전까지 실제 부동산·AI 교육 업무 자동화 사례를 1개 이상 준비해 발표 자료로 누적합니다.</p>
       </div>
@@ -1577,7 +1955,98 @@
     <footer class="footer">마지막 업데이트: 2026-07-13 · 도시아재 · 정적 HTML 파일</footer>
   </main>
 
+  <dialog class="guide-dialog" id="dashboardGuide" aria-labelledby="guideTitle">
+    <header class="guide-header">
+      <div>
+        <p class="guide-kicker">대시보드 읽기 안내</p>
+        <h2 id="guideTitle">계획이 실천으로 바뀌는 과정을 공개합니다</h2>
+        <p class="guide-lead">현직 공인중개사이자 법원경매 사업자, AI 강사인 도시아재가 4주 동안 Codex를 실제 반복업무에 적용하고 그 과정을 수강생과 공유하는 학습 운영판입니다.</p>
+      </div>
+      <button class="dialog-close" type="button" data-guide-close aria-label="안내 닫기" title="안내 닫기">×</button>
+    </header>
+
+    <div class="guide-body">
+      <section class="guide-section">
+        <h3>이 대시보드의 목적</h3>
+        <div class="guide-audience">
+          <div>
+            <strong>도시아재에게</strong>
+            <p>해야 할 일을 나열하는 데서 끝내지 않고, 계획·실행·수정·성과를 한곳에 남겨 4주 프로젝트를 끝까지 운영합니다.</p>
+          </div>
+          <div>
+            <strong>수강생과 공인중개사에게</strong>
+            <p>Codex 기능 설명보다 실제 중개·경매·교육 업무에 어떻게 붙이고 무엇을 검수해야 하는지 재현 가능한 사례로 보여줍니다.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="guide-section">
+        <h3>화면 구성</h3>
+        <div class="guide-menu-grid">
+          <div class="guide-menu-row"><strong>개요</strong><p>공식 일정, 4주 목표, 현재 단계와 검수 기준을 봅니다.</p></div>
+          <div class="guide-menu-row"><strong>자동화 후보</strong><p>중개 4개·경매 3개·AI 교육 3개 중 실험할 업무를 고릅니다.</p></div>
+          <div class="guide-menu-row"><strong>주차별 루틴</strong><p>매주 계획·실천·수정계획을 같은 구조로 누적합니다.</p></div>
+          <div class="guide-menu-row"><strong>벤치마킹</strong><p>이전 우수 사례에서 가져온 운영 원칙과 차별점을 확인합니다.</p></div>
+          <div class="guide-menu-row"><strong>문서</strong><p>과제, 실험 근거, 발표자료와 실행 지시서를 HTML로 읽습니다.</p></div>
+        </div>
+      </section>
+
+      <section class="guide-section">
+        <h3>4주 진행 흐름</h3>
+        <p>매주 새로운 기능을 배우는 것보다, 하나의 업무 흐름을 단계적으로 확장해 최종 에이전트 시스템으로 만드는 데 초점을 둡니다.</p>
+        <div class="guide-flow" aria-label="4주 진행 흐름">
+          <div class="guide-flow-step"><span>WEEK 1</span><strong>후보와 기준 설계</strong><p>반복업무 10개를 비교하고 현재 방식과 소요 시간을 기록합니다.</p></div>
+          <div class="guide-flow-step"><span>WEEK 2</span><strong>중개실무 적용</strong><p>공부서류 기반 매물 브리핑에 Skill·Plugin·MCP를 적용합니다.</p></div>
+          <div class="guide-flow-step"><span>WEEK 3</span><strong>법원경매 확장</strong><p>사건서류 요약과 충돌 표시를 화면 기반 자동화로 실험합니다.</p></div>
+          <div class="guide-flow-step"><span>WEEK 4</span><strong>교육 자산화</strong><p>두 실무 사례를 AGENTS.md, 강의안, 발표자료로 완성합니다.</p></div>
+        </div>
+      </section>
+
+      <section class="guide-section">
+        <h3>설계 의도와 읽는 법</h3>
+        <div class="guide-menu-grid">
+          <div class="guide-menu-row"><strong>계획보다 증거</strong><p>명령, 산출물, 소요 시간, 수정 내용을 남겨 실제 변화가 보이게 합니다.</p></div>
+          <div class="guide-menu-row"><strong>초안과 판단의 분리</strong><p>Codex는 자료 정리와 초안을 맡고, 수치·권리관계·법적 표현은 사람이 검수합니다.</p></div>
+          <div class="guide-menu-row"><strong>체크 상태는 개인용</strong><p>후보 선택과 주차 배치는 현재 브라우저에 저장되며 공개 진행률은 배포된 문서로 관리합니다.</p></div>
+          <div class="guide-menu-row"><strong>사례는 강의 자산으로</strong><p>실험 결과를 공인중개사가 따라 할 수 있는 프롬프트와 체크리스트로 전환합니다.</p></div>
+        </div>
+        <div class="guide-principle">이 대시보드는 “AI가 중개사 판단을 대신한다”는 사례가 아니라, 공인중개사가 AI를 검수 가능한 업무 도구로 설계하는 과정을 보여줍니다.</div>
+      </section>
+    </div>
+
+    <footer class="guide-actions">
+      <button class="guide-secondary" type="button" data-guide-close>안내 닫기</button>
+      <button class="guide-primary" id="guideExplore" type="button">자동화 후보 살펴보기</button>
+    </footer>
+  </dialog>
+
   <script>
+    const themeStorageKey = "gpters23-theme";
+    const themeToggle = document.getElementById("themeToggle");
+    const themeIcon = document.getElementById("themeIcon");
+    const themeLabel = document.getElementById("themeLabel");
+
+    function syncThemeButton() {
+      const isDark = document.documentElement.dataset.theme === "dark";
+      themeIcon.textContent = isDark ? "☀" : "☾";
+      themeLabel.textContent = isDark ? "라이트 모드" : "다크 모드";
+      themeToggle.setAttribute("aria-label", isDark ? "라이트 모드로 전환" : "다크 모드로 전환");
+      themeToggle.setAttribute("aria-pressed", String(isDark));
+    }
+
+    themeToggle.addEventListener("click", () => {
+      const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = nextTheme;
+      try {
+        localStorage.setItem(themeStorageKey, nextTheme);
+      } catch {
+        // The selected theme still applies for the current page.
+      }
+      syncThemeButton();
+    });
+
+    syncThemeButton();
+
     const tabButtons = document.querySelectorAll(".tab-button");
     const sections = document.querySelectorAll(".dashboard-section");
 
@@ -1587,6 +2056,33 @@
       tabButtons.forEach((item) => item.classList.toggle("active", item.dataset.target === targetId));
       sections.forEach((section) => section.classList.toggle("active", section.id === targetId));
     }
+
+    const guideButton = document.getElementById("guideButton");
+    const guideDialog = document.getElementById("dashboardGuide");
+    const guideExplore = document.getElementById("guideExplore");
+
+    guideButton.addEventListener("click", () => {
+      if (typeof guideDialog.showModal === "function") {
+        guideDialog.showModal();
+      } else {
+        guideDialog.setAttribute("open", "");
+      }
+    });
+
+    document.querySelectorAll("[data-guide-close]").forEach((button) => {
+      button.addEventListener("click", () => guideDialog.close());
+    });
+
+    guideDialog.addEventListener("click", (event) => {
+      if (event.target === guideDialog) guideDialog.close();
+    });
+
+    guideExplore.addEventListener("click", () => {
+      guideDialog.close();
+      location.hash = "candidates";
+      activateSection("candidates");
+      requestAnimationFrame(() => document.querySelector("nav")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    });
 
     tabButtons.forEach((button) => {
       button.addEventListener("click", () => {

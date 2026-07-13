@@ -429,7 +429,7 @@
         desc: "4주 동안 계획, 실천, 수정계획이 어디까지 진행됐는지 확인하는 운영판입니다.",
         sections: [
           { title: "현재 완료", list: ["운영 문서와 대시보드 구축", "Week 1 미니사례 방향 수립", "추천 후보와 주차별 루틴 반영", "GitHub와 Vercel 배포 완료"] },
-          { title: "아직 필요한 입력", list: ["최근 반복 업무 5개", "각 업무의 대략 또는 실측 소요 시간", "첫 번째 Before 측정", "Codex 적용 후 After 측정"] },
+          { title: "아직 필요한 입력", list: ["추천 후보의 회당 소요 시간과 월 발생 횟수", "가장 번거로운 단계", "첫 번째 Before 측정", "Codex 적용 후 After 측정"] },
           { title: "주차별 기준", list: ["Week 1(7/22): 중개·경매·교육 후보 10개와 현재 방식·소요 시간 기록", "Week 2(7/29): 공부서류 기반 매물 브리핑에 Skill·Plugin·MCP 중 1개 이상 적용", "Week 3(8/5): 경매 사건서류 확인에 Browser Use, Computer Use, Record & Replay, App Shot 중 1개 실험", "Week 4(8/12): 두 실무 사례를 공인중개사용 AI 강의와 에이전트 시스템으로 완성"] },
           { title: "핵심 리스크", body: "수치 오류, 법적 단정, 개인정보 노출, AI 결과 과신을 계속 분리해서 관리합니다." }
         ],
@@ -512,18 +512,18 @@
       "reply-template": {
         emoji: "💬",
         title: "답변 템플릿",
-        label: "반복 업무 5개 입력",
+        label: "후보별 시간 입력",
         source: "../../output/week1-submission/quick-reply-template.md",
-        desc: "도시아재가 반복 업무 후보와 시간을 빠르게 알려줄 때 쓰는 입력 양식입니다.",
+        desc: "대표님이 추천 후보의 시간과 발생 빈도를 빠르게 알려줄 때 쓰는 입력 양식입니다.",
         sections: [
-          { title: "필요한 답변", list: ["1순위 업무명", "2순위 업무명", "3순위 업무명", "각 업무의 회당 소요 시간", "왜 자동화하고 싶은지"] },
-          { title: "사용 방식", body: "이 템플릿으로 답하면 Codex가 CSV, 우선순위표, Week 1 제출본, 대시보드를 한 번에 갱신할 수 있습니다." }
+          { title: "필요한 답변", list: ["1번 매물 브리핑의 회당 시간과 월 발생 횟수", "5번 경매 사건서류 요약의 회당 시간과 월 발생 횟수", "8번 AI 강의안 작성의 회당 시간과 월 발생 횟수", "가장 번거로운 단계", "먼저 실험할 후보 번호"] },
+          { title: "사용 방식", body: "대략값을 먼저 입력하고 실제 수행 때 Before/After로 다시 측정합니다. 답변을 받으면 우선순위표, Week 1 제출본, 대시보드를 함께 갱신합니다." }
         ]
       },
       "automation-menu": {
         emoji: "🧭",
         title: "자동화 후보",
-        label: "중개업무·강의준비",
+        label: "중개·경매·AI 교육",
         source: "../../docs/recommended-automation-menu.md",
         desc: "중개실무, 법원경매, 공인중개사용 AI 교육을 함께 고려한 자동화 후보 목록입니다.",
         sections: [
@@ -567,7 +567,7 @@
         desc: "대화 컨텍스트가 압축되거나 새로 이어질 때 프로젝트를 복구하기 위한 인수인계 문서입니다.",
         sections: [
           { title: "현재 목표", body: "GPTERS 23기 Codex 앱 4주 스터디 동안 공인중개사 업무 자동화 에이전트 시스템을 기획, 실행, 기록하여 최종 사례글과 발표 자료까지 완성합니다." },
-          { title: "다음에 할 일", list: ["반복 업무 5개와 소요 시간 받기", "CSV와 제출 요약 갱신", "Before/After 실측", "사례글과 발표 자료 업데이트"] },
+          { title: "다음에 할 일", list: ["추천 후보의 시간과 월 발생 횟수 받기", "우선순위와 제출 요약 갱신", "Before/After 실측", "사례글과 발표 자료 업데이트"] },
           { title: "이어가기 문장", body: "docs/context-handoff.md와 scripts/Test-StudyReadiness.ps1 결과를 기준으로 GPTERS 23기 Codex 앱 스터디 목표를 이어서 진행해줘." }
         ]
       }

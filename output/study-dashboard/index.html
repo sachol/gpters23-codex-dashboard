@@ -1284,6 +1284,12 @@
       }
     }
   </style>
+  <link id="dashboardV2Styles" rel="stylesheet" href="/output/study-dashboard/dashboard-v2.css">
+  <script>
+    if (location.protocol === "file:") {
+      document.getElementById("dashboardV2Styles").href = "./dashboard-v2.css";
+    }
+  </script>
 </head>
 <body>
   <main class="shell">
@@ -1329,6 +1335,7 @@
       <ul class="tabs">
         <li><button class="tab-button active" type="button" data-target="overview">개요</button></li>
         <li><button class="tab-button" type="button" data-target="candidates">자동화 후보</button></li>
+        <li><button class="tab-button" type="button" data-target="performance">성과 기록</button></li>
         <li><button class="tab-button" type="button" data-target="weekly-routine">주차별 루틴</button></li>
         <li><button class="tab-button" type="button" data-target="benchmark">벤치마킹</button></li>
         <li><button class="tab-button" type="button" data-target="artifacts">문서</button></li>
@@ -1356,6 +1363,51 @@
           <div class="metric-label">검증 기준</div>
           <div class="metric-value">사람 최종 검수</div>
           <div class="metric-note">수치·권리관계·광고 표현 분리</div>
+        </div>
+      </section>
+
+      <section class="panel journey-panel" aria-labelledby="journeyTitle">
+        <div class="section-heading-row">
+          <div>
+            <span class="section-kicker">4-WEEK JOURNEY</span>
+            <h2 id="journeyTitle">계획에서 현장 사례까지</h2>
+            <p>각 주차의 상태 버튼을 누르면 대기 → 진행 → 완료로 바뀌며 이 브라우저에 저장됩니다.</p>
+          </div>
+          <div class="journey-overall" aria-live="polite">
+            <span>전체 이행률</span>
+            <strong id="journeyPercent">0%</strong>
+          </div>
+        </div>
+        <div class="journey-progress" aria-hidden="true"><span id="journeyProgressBar"></span></div>
+        <div class="journey-grid" id="journeyGrid">
+          <article class="journey-card" data-journey-week="week1" data-default-status="progress">
+            <div class="journey-head"><span>WEEK 1</span><time datetime="2026-07-22">7월 22일</time></div>
+            <strong>기획형 미니사례</strong>
+            <p>반복업무 10개를 비교하고 2~4주 실험 후보와 선정 기준을 발표합니다.</p>
+            <div class="journey-output"><span>산출물</span>운영 대시보드 · 후보 선택판</div>
+            <button class="journey-status" type="button" data-journey-status aria-label="Week 1 상태 변경">진행</button>
+          </article>
+          <article class="journey-card" data-journey-week="week2" data-default-status="wait">
+            <div class="journey-head"><span>WEEK 2</span><time datetime="2026-07-29">7월 29일</time></div>
+            <strong>중개실무 자동화</strong>
+            <p>공부서류 기반 매물 브리핑을 실행하고 기존 방식과 시간을 비교합니다.</p>
+            <div class="journey-output"><span>산출물</span>고객용 초안 · 내부 검수표</div>
+            <button class="journey-status" type="button" data-journey-status aria-label="Week 2 상태 변경">대기</button>
+          </article>
+          <article class="journey-card" data-journey-week="week3" data-default-status="wait">
+            <div class="journey-head"><span>WEEK 3</span><time datetime="2026-08-05">8월 5일</time></div>
+            <strong>법원경매 검토 보조</strong>
+            <p>사건서류 핵심 사실과 자료 간 충돌, 추가 확인 항목을 구조화합니다.</p>
+            <div class="journey-output"><span>산출물</span>요약표 · 충돌/확인 목록</div>
+            <button class="journey-status" type="button" data-journey-status aria-label="Week 3 상태 변경">대기</button>
+          </article>
+          <article class="journey-card" data-journey-week="week4" data-default-status="wait">
+            <div class="journey-head"><span>WEEK 4</span><time datetime="2026-08-12">8월 12일</time></div>
+            <strong>AI 교육 자산화</strong>
+            <p>실무 사례를 공인중개사용 강의안, 프롬프트, 최종 발표로 전환합니다.</p>
+            <div class="journey-output"><span>산출물</span>강의안 · 사례글 · 발표자료</div>
+            <button class="journey-status" type="button" data-journey-status aria-label="Week 4 상태 변경">대기</button>
+          </article>
         </div>
       </section>
 
@@ -1581,6 +1633,43 @@
             <strong>작업시간만 추가</strong>
             <p>후보별 회당 소요 시간은 대표님이 알려주시면 제출본에 반영합니다.</p>
           </div>
+        </div>
+        <div class="candidate-toolbar" aria-label="자동화 후보 필터">
+          <div class="filter-group filter-domain" role="group" aria-label="업무 영역">
+            <button class="filter-chip active" type="button" data-domain-filter="all" aria-pressed="true">전체</button>
+            <button class="filter-chip" type="button" data-domain-filter="brokerage" aria-pressed="false">중개업무</button>
+            <button class="filter-chip" type="button" data-domain-filter="auction" aria-pressed="false">법원경매</button>
+            <button class="filter-chip" type="button" data-domain-filter="education" aria-pressed="false">AI 강의</button>
+          </div>
+          <label class="filter-field search-field">
+            <span>후보 검색</span>
+            <input id="candidateSearch" type="search" placeholder="업무명·설명 검색" autocomplete="off">
+          </label>
+          <label class="filter-field">
+            <span>난이도</span>
+            <select id="difficultyFilter">
+              <option value="all">전체 난이도</option>
+              <option value="easy">쉬움</option>
+              <option value="medium">보통</option>
+              <option value="hard">높음</option>
+            </select>
+          </label>
+          <label class="filter-field">
+            <span>배치 주차</span>
+            <select id="candidateWeekFilter">
+              <option value="all">전체 주차</option>
+              <option value="week2">Week 2</option>
+              <option value="week3">Week 3</option>
+              <option value="week4">Week 4</option>
+              <option value="unassigned">미정</option>
+            </select>
+          </label>
+          <label class="selected-only"><input id="selectedOnlyFilter" type="checkbox"> 선택한 후보만</label>
+          <button class="filter-reset" id="candidateFilterReset" type="button" title="모든 필터를 초기화합니다.">필터 초기화</button>
+        </div>
+        <div class="filter-result-row" aria-live="polite">
+          <strong id="candidateResultCount">10개 후보</strong>
+          <span>비교는 최대 3개까지 담을 수 있습니다.</span>
         </div>
         <div class="candidate-grid">
           <article class="candidate-card" data-candidate="briefing">
@@ -1823,6 +1912,13 @@
             </details>
           </article>
         </div>
+        <section class="compare-panel" id="comparePanel" aria-labelledby="compareTitle" hidden>
+          <div class="compare-heading">
+            <div><span class="section-kicker">SHORTLIST</span><h3 id="compareTitle">후보 비교판</h3></div>
+            <button class="compare-clear" id="compareClear" type="button">비교 비우기</button>
+          </div>
+          <div class="compare-table-wrap"><table class="compare-table" id="compareTable"></table></div>
+        </section>
       </section>
 
       <section class="panel" style="margin-top:14px">
@@ -1834,6 +1930,57 @@
           <span class="metric-note">버튼을 누르면 이 프롬프트가 클립보드에 복사됩니다.</span>
           <button class="copy-button" type="button" data-copy="starterPrompt">프롬프트 복사</button>
         </div>
+      </section>
+    </section>
+
+    <section id="performance" class="dashboard-section">
+      <section class="panel performance-panel">
+        <div class="section-heading-row">
+          <div>
+            <span class="section-kicker">BEFORE / AFTER</span>
+            <h2>실제 업무 성과 기록</h2>
+            <p>Week 2~4 사례를 실행한 뒤 시간을 입력하면 절감 시간과 평균 절감률을 자동 계산합니다. 값은 이 브라우저에만 저장됩니다.</p>
+          </div>
+          <button class="performance-reset" id="performanceReset" type="button">입력값 초기화</button>
+        </div>
+        <div class="performance-summary" aria-label="성과 요약">
+          <article><span>측정 완료</span><strong id="measuredCount">0건</strong><small>Before와 After가 모두 입력된 사례</small></article>
+          <article><span>총 절감 시간</span><strong id="savedMinutes">0분</strong><small>검수 시간을 포함한 실제 입력값 기준</small></article>
+          <article><span>평균 절감률</span><strong id="savedRate">0%</strong><small>사례별 절감률의 평균</small></article>
+          <article><span>누적 산출물</span><strong id="artifactCount">0개</strong><small>완료로 표시한 사례의 결과물 수</small></article>
+        </div>
+        <div class="performance-table-wrap">
+          <table class="performance-table">
+            <thead><tr><th>주차·사례</th><th>기존 방식</th><th>Codex 적용</th><th>절감 결과</th><th>산출물</th><th>완료</th></tr></thead>
+            <tbody>
+              <tr data-performance-week="week2">
+                <td><span class="performance-week">WEEK 2</span><input data-field="topic" type="text" value="공부서류 기반 매물 브리핑" aria-label="Week 2 사례명"></td>
+                <td><label><span>분</span><input data-field="before" type="number" min="0" step="1" inputmode="numeric" placeholder="예: 60" aria-label="Week 2 기존 방식 소요 시간(분)"></label></td>
+                <td><label><span>분</span><input data-field="after" type="number" min="0" step="1" inputmode="numeric" placeholder="예: 25" aria-label="Week 2 Codex 적용 소요 시간(분)"></label></td>
+                <td><strong data-result>측정 전</strong><div class="result-bar"><span></span></div></td>
+                <td><input data-field="artifacts" type="number" min="0" step="1" inputmode="numeric" value="0" aria-label="Week 2 산출물 수"></td>
+                <td><input data-field="done" type="checkbox" aria-label="Week 2 사례 완료"></td>
+              </tr>
+              <tr data-performance-week="week3">
+                <td><span class="performance-week">WEEK 3</span><input data-field="topic" type="text" value="경매 사건서류 요약·충돌 표시" aria-label="Week 3 사례명"></td>
+                <td><label><span>분</span><input data-field="before" type="number" min="0" step="1" inputmode="numeric" placeholder="예: 90" aria-label="Week 3 기존 방식 소요 시간(분)"></label></td>
+                <td><label><span>분</span><input data-field="after" type="number" min="0" step="1" inputmode="numeric" placeholder="예: 45" aria-label="Week 3 Codex 적용 소요 시간(분)"></label></td>
+                <td><strong data-result>측정 전</strong><div class="result-bar"><span></span></div></td>
+                <td><input data-field="artifacts" type="number" min="0" step="1" inputmode="numeric" value="0" aria-label="Week 3 산출물 수"></td>
+                <td><input data-field="done" type="checkbox" aria-label="Week 3 사례 완료"></td>
+              </tr>
+              <tr data-performance-week="week4">
+                <td><span class="performance-week">WEEK 4</span><input data-field="topic" type="text" value="공인중개사용 AI 강의안" aria-label="Week 4 사례명"></td>
+                <td><label><span>분</span><input data-field="before" type="number" min="0" step="1" inputmode="numeric" placeholder="예: 120" aria-label="Week 4 기존 방식 소요 시간(분)"></label></td>
+                <td><label><span>분</span><input data-field="after" type="number" min="0" step="1" inputmode="numeric" placeholder="예: 50" aria-label="Week 4 Codex 적용 소요 시간(분)"></label></td>
+                <td><strong data-result>측정 전</strong><div class="result-bar"><span></span></div></td>
+                <td><input data-field="artifacts" type="number" min="0" step="1" inputmode="numeric" value="0" aria-label="Week 4 산출물 수"></td>
+                <td><input data-field="done" type="checkbox" aria-label="Week 4 사례 완료"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="performance-note"><strong>측정 원칙</strong><span>자료 준비부터 사람의 최종 검수까지 포함한 실제 시간을 입력합니다. 절감률은 효율 지표이며 결과의 정확성이나 법적 안전성을 보장하지 않습니다.</span></div>
       </section>
     </section>
 
@@ -2196,6 +2343,15 @@
         }
       });
     });
+  </script>
+  <script>
+    (() => {
+      const script = document.createElement("script");
+      script.src = location.protocol === "file:"
+        ? "./dashboard-v2.js"
+        : "/output/study-dashboard/dashboard-v2.js";
+      document.body.appendChild(script);
+    })();
   </script>
 </body>
 </html>

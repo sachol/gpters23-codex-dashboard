@@ -18,43 +18,156 @@
     }
   };
 
-  const journeyKey = "gpters23-journey-status-v2";
   const journeyLabels = { wait: "대기", progress: "진행", done: "완료" };
-  const journeyOrder = ["wait", "progress", "done"];
   const journeyCards = [...document.querySelectorAll("[data-journey-week]")];
-  const savedJourney = readJson(journeyKey, {});
+  const loopTaskKey = "gpters23-weekly-loop-tasks-v1";
+  const loopNoteKey = "gpters23-weekly-loop-notes-v1";
+  const loopWeeks = [...document.querySelectorAll("[data-loop-week]")];
+  const savedLoopTasks = readJson(loopTaskKey, {});
+  const savedLoopNotes = readJson(loopNoteKey, {});
 
-  function updateJourneySummary() {
-    const points = journeyCards.reduce((sum, card) => {
-      if (card.dataset.status === "done") return sum + 1;
-      if (card.dataset.status === "progress") return sum + 0.5;
-      return sum;
-    }, 0);
-    const percent = Math.round((points / journeyCards.length) * 100);
-    const label = document.getElementById("journeyPercent");
-    const bar = document.getElementById("journeyProgressBar");
-    if (label) label.textContent = `${percent}%`;
-    if (bar) bar.style.width = `${percent}%`;
-  }
-
-  function setJourneyStatus(card, status) {
-    card.dataset.status = status;
-    const button = card.querySelector("[data-journey-status]");
-    if (button) button.textContent = journeyLabels[status];
-  }
-
-  journeyCards.forEach((card) => {
-    const week = card.dataset.journeyWeek;
-    setJourneyStatus(card, savedJourney[week] || card.dataset.defaultStatus || "wait");
-    card.querySelector("[data-journey-status]")?.addEventListener("click", () => {
-      const nextIndex = (journeyOrder.indexOf(card.dataset.status) + 1) % journeyOrder.length;
-      setJourneyStatus(card, journeyOrder[nextIndex]);
-      const state = Object.fromEntries(journeyCards.map((item) => [item.dataset.journeyWeek, item.dataset.status]));
-      writeJson(journeyKey, state);
-      updateJourneySummary();
+  loopWeeks.forEach((week) => {
+    const weekId = week.dataset.loopWeek;
+    week.querySelectorAll("[data-loop-task]").forEach((input) => {
+      if (Object.prototype.hasOwnProperty.call(savedLoopTasks[weekId] || {}, input.dataset.loopTask)) {
+        input.checked = Boolean(savedLoopTasks[weekId][input.dataset.loopTask]);
+      }
+    });
+    week.querySelectorAll("[data-loop-note]").forEach((field) => {
+      if (Object.prototype.hasOwnProperty.call(savedLoopNotes[weekId] || {}, field.dataset.loopNote)) {
+        field.value = savedLoopNotes[weekId][field.dataset.loopNote];
+      }
     });
   });
-  updateJourneySummary();
+
+  function collectLoopTasks() {
+    return Object.fromEntries(loopWeeks.map((week) => [
+      week.dataset.loopWeek,
+      Object.fromEntries([...week.querySelectorAll("[data-loop-task]")].map((input) => [input.dataset.loopTask, input.checked]))
+    ]));
+  }
+
+  function collectLoopNotes() {
+    return Object.fromEntries(loopWeeks.map((week) => [
+      week.dataset.loopWeek,
+      Object.fromEntries([...week.querySelectorAll("[data-loop-note]")].map((field) => [field.dataset.loopNote, field.value]))
+    ]));
+  }
+
+  function setText(id, value) {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  }
+
+  function setWidth(id, percent) {
+    const element = document.getElementById(id);
+    if (element) element.style.width = `${percent}%`;
+  }
+
+  function updateLoopDashboard() {
+    const allTasks = loopWeeks.flatMap((week) => [...week.querySelectorAll("[data-loop-task]")]);
+    const completedTotal = allTasks.filter((input) => input.checked).length;
+    const overallPercent = allTasks.length ? Math.round((completedTotal / allTasks.length) * 100) : 0;
+    let currentWeek = null;
+    let nextTask = null;
+
+    loopWeeks.forEach((week) => {
+      const tasks = [...week.querySelectorAll("[data-loop-task]")];
+      const completed = tasks.filter((input) => input.checked).length;
+      const status = completed === 0 ? "wait" : completed === tasks.length ? "done" : "progress";
+      const percent = tasks.length ? Math.round((completed / tasks.length) * 100) : 0;
+      const weekId = week.dataset.loopWeek;
+      const journeyCard = journeyCards.find((card) => card.dataset.journeyWeek === weekId);
+
+      week.dataset.status = status;
+      const count = week.querySelector("[data-loop-count]");
+      const statusLabel = week.querySelector("[data-loop-status]");
+      const progress = week.querySelector("[data-loop-progress]");
+      if (count) count.textContent = `${completed}/${tasks.length}`;
+      if (statusLabel) statusLabel.textContent = journeyLabels[status];
+      if (progress) progress.style.width = `${percent}%`;
+
+      if (journeyCard) {
+        journeyCard.dataset.status = status;
+        const button = journeyCard.querySelector("[data-journey-status]");
+        if (button) button.textContent = journeyLabels[status];
+      }
+
+      if (!currentWeek && status !== "done") {
+        currentWeek = { week, completed, total: tasks.length };
+        nextTask = tasks.find((input) => !input.checked)?.closest(".loop-task")?.querySelector(".loop-task-text")?.textContent.trim();
+      }
+    });
+
+    setText("loopCompletion", `${completedTotal}/${allTasks.length}`);
+    setText("journeyPercent", `${overallPercent}%`);
+    setText("heroProgressLabel", `${completedTotal}/${allTasks.length} 완료`);
+    setWidth("journeyProgressBar", overallPercent);
+    setWidth("heroProgressBar", overallPercent);
+
+    if (currentWeek) {
+      const weekName = currentWeek.week.querySelector(".loop-week-head span")?.textContent.split("·")[0].trim() || "현재 주차";
+      setText("loopCurrentWeek", `${weekName} · ${currentWeek.completed}/${currentWeek.total}`);
+      setText("loopNextAction", `${weekName} · ${nextTask || "다음 실험 확인"}`);
+      setText("heroStatus", `${weekName} 실행 중`);
+      setText("heroNextAction", nextTask || "실행 루프 확인");
+    } else {
+      setText("loopCurrentWeek", "4주 루프 완료");
+      setText("loopNextAction", "검증 결과를 실무와 강의에 계속 확장");
+      setText("heroStatus", "4주 루프 완료");
+      setText("heroNextAction", "후속 자동화 운영");
+    }
+  }
+
+  loopWeeks.forEach((week) => {
+    week.querySelectorAll("[data-loop-task]").forEach((input) => {
+      input.addEventListener("change", () => {
+        writeJson(loopTaskKey, collectLoopTasks());
+        updateLoopDashboard();
+      });
+    });
+    week.querySelectorAll("[data-loop-note]").forEach((field) => {
+      field.addEventListener("input", () => writeJson(loopNoteKey, collectLoopNotes()));
+    });
+  });
+
+  journeyCards.forEach((card) => {
+    card.querySelector("[data-journey-status]")?.addEventListener("click", () => {
+      document.querySelector('[data-target="weekly-routine"]')?.click();
+      setTimeout(() => document.getElementById(`loop-${card.dataset.journeyWeek}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+    });
+  });
+
+  document.getElementById("loopExport")?.addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    const summary = loopWeeks.flatMap((week) => {
+      const heading = week.querySelector(".loop-week-head div:first-child")?.innerText.replace(/\n/g, " · ") || week.dataset.loopWeek;
+      const topic = week.querySelector('[data-loop-note="topic"]')?.value.trim();
+      const taskLines = [...week.querySelectorAll(".loop-task")].map((task) => {
+        const input = task.querySelector("[data-loop-task]");
+        const phase = task.querySelector("b")?.textContent.trim();
+        const label = task.querySelector(".loop-task-text")?.textContent.trim();
+        return `- [${input.checked ? "완료" : "대기"}] ${phase}: ${label}`;
+      });
+      const notes = [...week.querySelectorAll("[data-loop-note]")]
+        .filter((field) => field.dataset.loopNote !== "topic" && field.value.trim())
+        .map((field) => `- ${field.closest("label")?.querySelector("span")?.textContent.trim()}: ${field.value.trim()}`);
+      return [`[${heading}]`, `주제: ${topic || "미정"}`, ...taskLines, ...notes, ""];
+    }).join("\n");
+    const exportText = `GPTERS 23기 Codex 실행 루프 업데이트\n전체 진행: ${document.getElementById("loopCompletion")?.textContent}\n\n${summary}`;
+
+    try {
+      await navigator.clipboard.writeText(exportText);
+      button.textContent = "복사 완료";
+    } catch {
+      button.textContent = "복사 실패";
+    }
+    setTimeout(() => {
+      button.textContent = "진행 요약 복사";
+    }, 1600);
+  });
+
+  updateLoopDashboard();
 
   const candidateData = {
     briefing: { domain: "brokerage", difficulty: 60, effect: 95, label: "중개업무" },

@@ -17,3 +17,5 @@ Thumbs.db
 .DS_Store
 *.tmp
 *.log
+.vercel
+.env*

@@ -473,7 +473,7 @@
         <div class="slide-no">03 / 06</div>
       </header>
       <div class="visual">
-        <img src="../gpters-case-study/images/workflow-diagram.png" alt="공부서류 기반 매물 브리핑 초안 에이전트 워크플로">
+        <img src="/output/gpters-case-study/images/workflow-diagram.png" data-file-src="../gpters-case-study/images/workflow-diagram.png" alt="공부서류 기반 매물 브리핑 초안 에이전트 워크플로" loading="eager" decoding="async">
       </div>
       <div class="grid three" style="margin-top: 18px;">
         <div class="box">
@@ -611,10 +611,17 @@
         </div>
       </div>
       <div class="visual" style="margin-top: 18px;">
-        <img src="../gpters-case-study/images/evidence-card.png" alt="현재 확보한 증거 카드">
+        <img src="/output/gpters-case-study/images/evidence-card.png" data-file-src="../gpters-case-study/images/evidence-card.png" alt="현재 확보한 증거 카드" loading="eager" decoding="async">
       </div>
-      <p class="footer-note">작성: 신화 · 기준일: 2026-07-04 · 실측 수치는 Week 1 이후 업데이트 예정</p>
+      <p class="footer-note">작성: 신화 · 작성 기준일: 2026-07-22 · 리비전 v1.3 · 실측 수치는 Week 1 이후 업데이트 예정</p>
     </section>
   </main>
+  <script>
+    if (location.protocol === "file:") {
+      document.querySelectorAll("img[data-file-src]").forEach((image) => {
+        image.src = image.dataset.fileSrc;
+      });
+    }
+  </script>
 </body>
 </html>

@@ -1308,6 +1308,10 @@
               <span class="utility-icon" aria-hidden="true">i</span>
               <span>대시보드 안내</span>
             </button>
+            <button class="utility-button" id="revisionButton" type="button" aria-haspopup="dialog" aria-controls="revisionHistory" title="작성 기준일과 주요 변경 이력을 확인합니다.">
+              <span class="utility-icon" aria-hidden="true">↻</span>
+              <span>리비전 이력</span>
+            </button>
             <button class="utility-button" id="themeToggle" type="button" title="화면 테마를 전환합니다.">
               <span class="utility-icon" id="themeIcon" aria-hidden="true">☾</span>
               <span id="themeLabel">다크 모드</span>
@@ -2236,7 +2240,7 @@
       </section>
     </section>
 
-    <footer class="footer">마지막 업데이트: 2026-07-21 · 도시아재 · 브라우저 저장형 실행 대시보드</footer>
+    <footer class="footer">작성 기준일: 2026-07-22 · 리비전 v1.3 · 도시아재 · 브라우저 저장형 실행 대시보드</footer>
   </main>
 
   <dialog class="guide-dialog" id="dashboardGuide" aria-labelledby="guideTitle">
@@ -2305,6 +2309,39 @@
     </footer>
   </dialog>
 
+  <dialog class="guide-dialog revision-dialog" id="revisionHistory" aria-labelledby="revisionTitle">
+    <header class="guide-header">
+      <div>
+        <p class="guide-kicker">REVISION HISTORY</p>
+        <h2 id="revisionTitle">대시보드 변경 이력</h2>
+        <p class="guide-lead">내용을 수정할 때마다 작성 기준일과 핵심 변경 사항을 함께 갱신합니다.</p>
+      </div>
+      <button class="dialog-close" type="button" data-revision-close aria-label="리비전 이력 닫기" title="리비전 이력 닫기">×</button>
+    </header>
+    <div class="guide-body">
+      <ol class="revision-list">
+        <li class="revision-entry revision-current">
+          <div class="revision-meta"><strong>v1.3</strong><time datetime="2026-07-22">2026-07-22</time><span>현재 버전</span></div>
+          <h3>GPTERS 디자인과 이미지 안정성 보강</h3>
+          <p>GPTERS 브랜드 톤을 적용하고, 발표 이미지의 배포·로컬 경로를 분리했으며 리비전 관리 화면을 추가했습니다.</p>
+        </li>
+        <li class="revision-entry">
+          <div class="revision-meta"><strong>v1.2</strong><time datetime="2026-07-21">2026-07-21</time><code>21af2a1</code></div>
+          <h3>4주 실행 루프 추가</h3>
+          <p>계획·실행·검증·확장 흐름과 주차별 체크, 메모, 진행률 관리 기능을 추가했습니다.</p>
+        </li>
+        <li class="revision-entry">
+          <div class="revision-meta"><strong>v1.1</strong><time datetime="2026-07-13">2026-07-13</time><code>c038f9d</code></div>
+          <h3>인터랙티브 대시보드 전환</h3>
+          <p>라이트·다크 모드, 대시보드 안내, 후보 선택과 진행상황 저장 기능을 적용했습니다.</p>
+        </li>
+      </ol>
+    </div>
+    <footer class="guide-actions">
+      <button class="guide-secondary" type="button" data-revision-close>이력 닫기</button>
+    </footer>
+  </dialog>
+
   <script>
     const themeStorageKey = "gpters23-theme";
     const themeToggle = document.getElementById("themeToggle");
@@ -2367,6 +2404,25 @@
       location.hash = "candidates";
       activateSection("candidates");
       requestAnimationFrame(() => document.querySelector("nav")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    });
+
+    const revisionButton = document.getElementById("revisionButton");
+    const revisionDialog = document.getElementById("revisionHistory");
+
+    revisionButton.addEventListener("click", () => {
+      if (typeof revisionDialog.showModal === "function") {
+        revisionDialog.showModal();
+      } else {
+        revisionDialog.setAttribute("open", "");
+      }
+    });
+
+    document.querySelectorAll("[data-revision-close]").forEach((button) => {
+      button.addEventListener("click", () => revisionDialog.close());
+    });
+
+    revisionDialog.addEventListener("click", (event) => {
+      if (event.target === revisionDialog) revisionDialog.close();
     });
 
     tabButtons.forEach((button) => {

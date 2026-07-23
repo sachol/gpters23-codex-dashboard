@@ -1,0 +1,10 @@
+{
+  "name": "gpters23-codex-dashboard",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.cjs"
+  },
+  "engines": {
+    "node": "24.x"
+  }
+}

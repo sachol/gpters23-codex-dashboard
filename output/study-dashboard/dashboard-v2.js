@@ -182,6 +182,8 @@
     faq: { domain: "education", difficulty: 32, effect: 80, label: "AI 강의" }
   };
 
+  const candidateDetailKey = "gpters23-candidate-details-v1";
+  const savedCandidateDetails = readJson(candidateDetailKey, {});
   const candidateCards = [...document.querySelectorAll(".candidate-card[data-candidate]")];
   const domainButtons = [...document.querySelectorAll("[data-domain-filter]")];
   const searchInput = document.getElementById("candidateSearch");
@@ -201,6 +203,18 @@
     if (!meta) return;
     card.dataset.domain = meta.domain;
     card.dataset.difficulty = difficultyBand(meta.difficulty);
+    const savedDetail = savedCandidateDetails[id] || {};
+    const details = document.createElement("div");
+    details.className = "candidate-db-fields";
+    details.innerHTML = `
+      <label><span>회당 시간(분)</span><input type="number" min="0" max="1440" step="1" inputmode="numeric" data-candidate-meta="estimatedMinutes" aria-label="${id} 회당 예상 시간"></label>
+      <label><span>월 발생 횟수</span><input type="number" min="0" max="1000" step="1" inputmode="numeric" data-candidate-meta="monthlyFrequency" aria-label="${id} 월 발생 횟수"></label>
+      <label><span>공개 사례화</span><select data-candidate-meta="publicCase" aria-label="${id} 공개 사례화 가능 여부"><option value="">미정</option><option value="true">가능</option><option value="false">비공개</option></select></label>
+    `;
+    details.querySelector('[data-candidate-meta="estimatedMinutes"]').value = savedDetail.estimatedMinutes ?? "";
+    details.querySelector('[data-candidate-meta="monthlyFrequency"]').value = savedDetail.monthlyFrequency ?? "";
+    details.querySelector('[data-candidate-meta="publicCase"]').value = savedDetail.publicCase ?? "";
+    card.appendChild(details);
     const button = document.createElement("button");
     button.type = "button";
     button.className = "compare-toggle";
@@ -209,6 +223,24 @@
     button.setAttribute("aria-pressed", "false");
     button.title = "최대 3개 후보의 난이도와 기대 효과를 나란히 비교합니다.";
     card.appendChild(button);
+  });
+
+  function collectCandidateDetails() {
+    return Object.fromEntries(candidateCards.map((card) => [
+      card.dataset.candidate,
+      Object.fromEntries([...card.querySelectorAll("[data-candidate-meta]")].map((field) => [
+        field.dataset.candidateMeta,
+        field.value
+      ]))
+    ]));
+  }
+
+  candidateCards.forEach((card) => {
+    card.querySelectorAll("[data-candidate-meta]").forEach((field) => {
+      field.addEventListener(field.tagName === "SELECT" ? "change" : "input", () => {
+        writeJson(candidateDetailKey, collectCandidateDetails());
+      });
+    });
   });
 
   function applyCandidateFilters() {
@@ -391,4 +423,355 @@
     updatePerformance();
   });
   updatePerformance();
+
+  const sessionDates = {
+    week1: "2026-07-22",
+    week2: "2026-07-29",
+    week3: "2026-08-05",
+    week4: "2026-08-12"
+  };
+  const cloudLastSyncKey = "gpters23-cloud-last-sync-v1";
+  const cloudPanel = document.getElementById("cloudSyncPanel");
+  const cloudStatus = document.getElementById("cloudStatus");
+  const cloudStatusDetail = document.getElementById("cloudStatusDetail");
+  const cloudLoad = document.getElementById("cloudLoad");
+  const cloudLogin = document.getElementById("cloudLogin");
+  const cloudSave = document.getElementById("cloudSave");
+  const cloudDialog = document.getElementById("cloudLoginDialog");
+  const cloudLoginForm = document.getElementById("cloudLoginForm");
+  const cloudPassword = document.getElementById("cloudPassword");
+  const cloudLoginMessage = document.getElementById("cloudLoginMessage");
+  let cloudState = null;
+  let cloudConfigured = false;
+  let cloudAuthenticated = false;
+  let cloudBusy = false;
+
+  function setCloudStatus(state, title, detail) {
+    if (cloudPanel) cloudPanel.dataset.state = state;
+    if (cloudStatus) cloudStatus.textContent = title;
+    if (cloudStatusDetail) cloudStatusDetail.textContent = detail;
+  }
+
+  function setCloudEditable(enabled) {
+    const controls = [
+      ...loopWeeks.flatMap((week) => [...week.querySelectorAll("[data-loop-task], [data-loop-note]")]),
+      ...performanceRows.flatMap((row) => [...row.querySelectorAll("[data-field]")]),
+      ...candidateCards.flatMap((card) => [...card.querySelectorAll("[data-choice], [data-week], [data-candidate-meta]")])
+    ];
+    controls.forEach((control) => {
+      control.disabled = !enabled;
+      control.dataset.cloudEditable = "";
+    });
+    if (cloudSave) cloudSave.disabled = !enabled || cloudBusy || !cloudConfigured;
+    if (cloudLogin) cloudLogin.textContent = cloudAuthenticated && cloudConfigured ? "관리자 로그아웃" : "관리자 편집";
+  }
+
+  function nullableNumber(value) {
+    if (value === "" || value == null) return null;
+    const number = Number(value);
+    return Number.isFinite(number) ? number : null;
+  }
+
+  function collectDashboardState() {
+    const cloudWeekly = new Map((cloudState?.weekly || []).map((row) => [row.weekId, row]));
+    const weekly = loopWeeks.map((week) => {
+      const weekId = week.dataset.loopWeek;
+      const performanceRow = performanceRows.find((row) => row.dataset.performanceWeek === weekId);
+      return {
+        weekId,
+        sessionDate: sessionDates[weekId],
+        topic: week.querySelector('[data-loop-note="topic"]')?.value.trim() || "",
+        tasks: Object.fromEntries([...week.querySelectorAll("[data-loop-task]")].map((input) => [
+          input.dataset.loopTask,
+          input.checked
+        ])),
+        result: week.querySelector('[data-loop-note="result"]')?.value.trim() || "",
+        feedback: week.querySelector('[data-loop-note="feedback"]')?.value.trim() || "",
+        nextExperiment: week.querySelector('[data-loop-note="next"]')?.value.trim() || "",
+        beforeMinutes: nullableNumber(performanceRow?.querySelector('[data-field="before"]')?.value),
+        afterMinutes: nullableNumber(performanceRow?.querySelector('[data-field="after"]')?.value),
+        artifactsCount: nullableNumber(performanceRow?.querySelector('[data-field="artifacts"]')?.value) || 0,
+        caseDone: Boolean(performanceRow?.querySelector('[data-field="done"]')?.checked),
+        revisionNo: Number(cloudWeekly.get(weekId)?.revisionNo) || 0
+      };
+    });
+
+    const candidates = candidateCards.map((card) => {
+      const publicCaseValue = card.querySelector('[data-candidate-meta="publicCase"]')?.value || "";
+      return {
+        candidateId: card.dataset.candidate,
+        candidateName: card.querySelector(":scope > strong")?.textContent.trim() || card.dataset.candidate,
+        domain: candidateData[card.dataset.candidate].domain,
+        selected: Boolean(card.querySelector("[data-choice]")?.checked),
+        assignedWeek: card.querySelector("[data-week]")?.value || "",
+        estimatedMinutes: nullableNumber(card.querySelector('[data-candidate-meta="estimatedMinutes"]')?.value),
+        monthlyFrequency: nullableNumber(card.querySelector('[data-candidate-meta="monthlyFrequency"]')?.value),
+        publicCase: publicCaseValue === "" ? null : publicCaseValue === "true"
+      };
+    });
+
+    return { weekly, candidates, deviceLabel: "office-chrome" };
+  }
+
+  function comparableState(state) {
+    return JSON.stringify({
+      weekly: (state?.weekly || []).map((row) => ({
+        weekId: row.weekId,
+        sessionDate: row.sessionDate,
+        topic: row.topic || "",
+        tasks: row.tasks,
+        result: row.result || "",
+        feedback: row.feedback || "",
+        nextExperiment: row.nextExperiment || "",
+        beforeMinutes: row.beforeMinutes ?? null,
+        afterMinutes: row.afterMinutes ?? null,
+        artifactsCount: Number(row.artifactsCount) || 0,
+        caseDone: Boolean(row.caseDone)
+      })),
+      candidates: (state?.candidates || []).map((row) => ({
+        candidateId: row.candidateId,
+        candidateName: row.candidateName,
+        domain: row.domain,
+        selected: Boolean(row.selected),
+        assignedWeek: row.assignedWeek || "",
+        estimatedMinutes: row.estimatedMinutes ?? null,
+        monthlyFrequency: row.monthlyFrequency ?? null,
+        publicCase: row.publicCase ?? null
+      }))
+    });
+  }
+
+  function applyCloudState(state, meta = {}) {
+    cloudState = state;
+    const weeklyById = new Map((state.weekly || []).map((row) => [row.weekId, row]));
+    loopWeeks.forEach((week) => {
+      const row = weeklyById.get(week.dataset.loopWeek);
+      if (!row) return;
+      week.querySelectorAll("[data-loop-task]").forEach((input) => {
+        input.checked = Boolean(row.tasks?.[input.dataset.loopTask]);
+      });
+      const noteValues = {
+        topic: row.topic || "",
+        result: row.result || "",
+        feedback: row.feedback || "",
+        next: row.nextExperiment || ""
+      };
+      week.querySelectorAll("[data-loop-note]").forEach((field) => {
+        field.value = noteValues[field.dataset.loopNote] || "";
+      });
+      const performanceRow = performanceRows.find((item) => item.dataset.performanceWeek === row.weekId);
+      if (performanceRow) {
+        performanceRow.querySelector('[data-field="topic"]').value = row.topic || "";
+        performanceRow.querySelector('[data-field="before"]').value = row.beforeMinutes ?? "";
+        performanceRow.querySelector('[data-field="after"]').value = row.afterMinutes ?? "";
+        performanceRow.querySelector('[data-field="artifacts"]').value = row.artifactsCount ?? 0;
+        performanceRow.querySelector('[data-field="done"]').checked = Boolean(row.caseDone);
+      }
+    });
+
+    const candidateById = new Map((state.candidates || []).map((row) => [row.candidateId, row]));
+    candidateCards.forEach((card) => {
+      const row = candidateById.get(card.dataset.candidate);
+      if (!row) return;
+      card.querySelector("[data-choice]").checked = Boolean(row.selected);
+      card.querySelector("[data-week]").value = row.assignedWeek || "";
+      card.querySelector('[data-candidate-meta="estimatedMinutes"]').value = row.estimatedMinutes ?? "";
+      card.querySelector('[data-candidate-meta="monthlyFrequency"]').value = row.monthlyFrequency ?? "";
+      card.querySelector('[data-candidate-meta="publicCase"]').value = row.publicCase == null ? "" : String(row.publicCase);
+    });
+
+    writeJson(loopTaskKey, collectLoopTasks());
+    writeJson(loopNoteKey, collectLoopNotes());
+    writeJson(performanceKey, collectPerformance());
+    writeJson(candidateDetailKey, collectCandidateDetails());
+    localStorage.setItem(
+      "gpters23-candidate-choices-v2",
+      JSON.stringify(Object.fromEntries(candidateCards.map((card) => [card.dataset.candidate, card.querySelector("[data-choice]").checked])))
+    );
+    localStorage.setItem(
+      "gpters23-candidate-weeks-v2",
+      JSON.stringify(Object.fromEntries(candidateCards.map((card) => [card.dataset.candidate, card.querySelector("[data-week]").value])))
+    );
+    localStorage.setItem(cloudLastSyncKey, meta.readAt || new Date().toISOString());
+
+    updateLoopDashboard();
+    updatePerformance();
+    applyCandidateFilters();
+    renderComparison();
+    candidateCards.forEach((card) => card.classList.toggle("selected", card.querySelector("[data-choice]").checked));
+    const selectedCount = candidateCards.filter((card) => card.querySelector("[data-choice]").checked).length;
+    setText("selectedCount", `${selectedCount}개 선택`);
+  }
+
+  async function requestJson(url, options = {}) {
+    const response = await fetch(url, {
+      credentials: "same-origin",
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      }
+    });
+    let data = {};
+    try {
+      data = await response.json();
+    } catch {
+      data = { ok: false, error: "서버 응답을 읽지 못했습니다." };
+    }
+    return { response, data };
+  }
+
+  async function loadCloudState(force = false) {
+    if (!cloudConfigured || cloudBusy) return;
+    cloudBusy = true;
+    if (cloudLoad) cloudLoad.disabled = true;
+    setCloudStatus("checking", "Google Sheets 불러오는 중", "현재 브라우저의 임시 저장 내용은 유지됩니다.");
+    try {
+      const { response, data } = await requestJson("/api/state");
+      if (!response.ok || !data.state) throw new Error(data.error || "클라우드 데이터를 불러오지 못했습니다.");
+      const localState = collectDashboardState();
+      cloudState = data.state;
+      const hasPreviousSync = Boolean(localStorage.getItem(cloudLastSyncKey));
+      const differs = comparableState(localState) !== comparableState(data.state);
+      if (!force && differs && !hasPreviousSync) {
+        setCloudStatus("draft", "로컬 초안이 있습니다", "관리자 로그인 후 저장하거나 클라우드 불러오기를 선택하세요.");
+      } else {
+        applyCloudState(data.state, data.meta || {});
+        setCloudStatus("connected", "Google Sheets 연결됨", `마지막 불러오기 ${new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })}`);
+      }
+    } catch (error) {
+      setCloudStatus("error", "클라우드 불러오기 실패", error.message);
+    } finally {
+      cloudBusy = false;
+      if (cloudLoad) cloudLoad.disabled = false;
+      setCloudEditable(cloudAuthenticated);
+    }
+  }
+
+  async function initializeCloud() {
+    if (location.protocol === "file:") {
+      cloudConfigured = false;
+      cloudAuthenticated = true;
+      setCloudStatus("draft", "로컬 파일 모드", "Vercel 주소에서 열면 Google Sheets와 연결됩니다.");
+      if (cloudLoad) cloudLoad.disabled = true;
+      if (cloudLogin) cloudLogin.disabled = true;
+      setCloudEditable(true);
+      return;
+    }
+
+    try {
+      const [sessionResult, stateResult] = await Promise.all([
+        requestJson("/api/session"),
+        requestJson("/api/state")
+      ]);
+      if (stateResult.response.status === 503) {
+        cloudConfigured = false;
+        cloudAuthenticated = true;
+        setCloudStatus("draft", "클라우드 설정 전", "현재는 이 브라우저에 임시 저장됩니다.");
+        if (cloudLoad) cloudLoad.disabled = true;
+        if (cloudLogin) cloudLogin.disabled = true;
+        setCloudEditable(true);
+        return;
+      }
+      if (!stateResult.response.ok || !stateResult.data.state) {
+        throw new Error(stateResult.data.error || "Google Sheets 연결을 확인하지 못했습니다.");
+      }
+      cloudConfigured = true;
+      cloudAuthenticated = Boolean(sessionResult.data.authenticated);
+      cloudState = stateResult.data.state;
+      const localState = collectDashboardState();
+      const hasPreviousSync = Boolean(localStorage.getItem(cloudLastSyncKey));
+      const differs = comparableState(localState) !== comparableState(cloudState);
+      if (differs && !hasPreviousSync) {
+        setCloudStatus("draft", "로컬 초안이 있습니다", "관리자 로그인 후 저장하거나 클라우드 값을 불러오세요.");
+      } else {
+        applyCloudState(cloudState, stateResult.data.meta || {});
+        setCloudStatus("connected", "Google Sheets 연결됨", cloudAuthenticated ? "관리자 편집 가능" : "읽기 전용");
+      }
+      setCloudEditable(cloudAuthenticated);
+    } catch (error) {
+      cloudConfigured = false;
+      cloudAuthenticated = true;
+      setCloudStatus("error", "로컬 저장 모드", "클라우드 연결 실패로 브라우저 임시 저장을 사용합니다.");
+      if (cloudLoad) cloudLoad.disabled = true;
+      if (cloudLogin) cloudLogin.disabled = true;
+      setCloudEditable(true);
+    }
+  }
+
+  cloudLoad?.addEventListener("click", () => loadCloudState(true));
+
+  cloudLogin?.addEventListener("click", async () => {
+    if (!cloudConfigured || cloudBusy) return;
+    if (cloudAuthenticated) {
+      cloudBusy = true;
+      try {
+        await requestJson("/api/session", { method: "DELETE", body: "{}" });
+        cloudAuthenticated = false;
+        setCloudEditable(false);
+        setCloudStatus("connected", "Google Sheets 연결됨", "관리자 로그아웃 · 읽기 전용");
+      } finally {
+        cloudBusy = false;
+      }
+      return;
+    }
+    if (cloudLoginMessage) cloudLoginMessage.textContent = "";
+    if (cloudPassword) cloudPassword.value = "";
+    cloudDialog?.showModal();
+    setTimeout(() => cloudPassword?.focus(), 40);
+  });
+
+  document.getElementById("cloudLoginClose")?.addEventListener("click", () => cloudDialog?.close());
+  document.getElementById("cloudLoginCancel")?.addEventListener("click", () => cloudDialog?.close());
+
+  cloudLoginForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!cloudPassword?.value || cloudBusy) return;
+    cloudBusy = true;
+    if (cloudLoginMessage) cloudLoginMessage.textContent = "확인 중입니다.";
+    try {
+      const { response, data } = await requestJson("/api/session", {
+        method: "POST",
+        body: JSON.stringify({ password: cloudPassword.value })
+      });
+      if (!response.ok) throw new Error(data.error || "로그인하지 못했습니다.");
+      cloudAuthenticated = true;
+      setCloudEditable(true);
+      setCloudStatus("connected", "관리자 편집 모드", "변경 후 저장 버튼을 눌러 Google Sheets에 반영하세요.");
+      cloudDialog?.close();
+    } catch (error) {
+      if (cloudLoginMessage) cloudLoginMessage.textContent = error.message;
+    } finally {
+      cloudBusy = false;
+      setCloudEditable(cloudAuthenticated);
+    }
+  });
+
+  cloudSave?.addEventListener("click", async () => {
+    if (!cloudAuthenticated || cloudBusy) return;
+    cloudBusy = true;
+    setCloudEditable(true);
+    if (cloudSave) {
+      cloudSave.disabled = true;
+      cloudSave.textContent = "저장 중";
+    }
+    setCloudStatus("checking", "Google Sheets 저장 중", "수정 이력도 함께 기록합니다.");
+    try {
+      const { response, data } = await requestJson("/api/state", {
+        method: "PUT",
+        body: JSON.stringify(collectDashboardState())
+      });
+      if (!response.ok || !data.state) throw new Error(data.error || "저장하지 못했습니다.");
+      applyCloudState(data.state, data.meta || {});
+      setCloudStatus("connected", "Google Sheets 저장 완료", new Date().toLocaleString("ko-KR"));
+    } catch (error) {
+      setCloudStatus("error", "클라우드 저장 실패", error.message);
+    } finally {
+      cloudBusy = false;
+      if (cloudSave) cloudSave.textContent = "변경사항 저장";
+      setCloudEditable(cloudAuthenticated);
+    }
+  });
+
+  initializeCloud();
 })();

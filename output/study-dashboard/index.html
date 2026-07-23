@@ -1969,11 +1969,11 @@
       <section class="panel performance-panel">
         <div class="section-heading-row">
           <div>
-            <span class="section-kicker">BEFORE / AFTER</span>
-            <h2>실제 업무 성과 기록</h2>
-            <p>Week 2~4 사례를 실행한 뒤 시간을 입력하면 절감 시간과 평균 절감률을 자동 계산합니다. 값은 이 브라우저에만 저장됩니다.</p>
+            <span class="section-kicker">CASE / BEFORE / AFTER</span>
+            <h2>4주 사례·성과 기록</h2>
+            <p>Week 1은 기획·구축형 사례의 산출물을 기록하고, Week 2~4는 실제 업무 시간을 입력해 절감 시간과 평균 절감률을 계산합니다. 관리자 저장 시 Google Sheets에 반영됩니다.</p>
           </div>
-          <button class="performance-reset" id="performanceReset" type="button">입력값 초기화</button>
+          <button class="performance-reset" id="performanceReset" type="button">측정값 초기화</button>
         </div>
         <div class="performance-summary" aria-label="성과 요약">
           <article><span>측정 완료</span><strong id="measuredCount">0건</strong><small>Before와 After가 모두 입력된 사례</small></article>
@@ -1985,6 +1985,14 @@
           <table class="performance-table">
             <thead><tr><th>주차·사례</th><th>기존 방식</th><th>Codex 적용</th><th>절감 결과</th><th>산출물</th><th>완료</th></tr></thead>
             <tbody>
+              <tr class="performance-planning-row" data-performance-week="week1" data-measurement="excluded">
+                <td><span class="performance-week">WEEK 1 · 기획·구축</span><input data-field="topic" type="text" value="4주 실행 대시보드 제작" aria-label="Week 1 사례명"></td>
+                <td><input data-field="before" data-always-disabled type="number" disabled placeholder="측정 대상 아님" aria-label="Week 1 기존 방식 시간 측정 제외"></td>
+                <td><input data-field="after" data-always-disabled type="number" disabled placeholder="측정 대상 아님" aria-label="Week 1 Codex 적용 시간 측정 제외"></td>
+                <td><strong data-result>정량 측정 제외</strong><div class="result-bar"><span></span></div></td>
+                <td><input data-field="artifacts" type="number" min="0" step="1" inputmode="numeric" value="2" aria-label="Week 1 산출물 수"></td>
+                <td><input data-field="done" type="checkbox" checked aria-label="Week 1 사례 완료"></td>
+              </tr>
               <tr data-performance-week="week2">
                 <td><span class="performance-week">WEEK 2</span><input data-field="topic" type="text" value="공부서류 기반 매물 브리핑" aria-label="Week 2 사례명"></td>
                 <td><label><span>분</span><input data-field="before" type="number" min="0" step="1" inputmode="numeric" placeholder="예: 60" aria-label="Week 2 기존 방식 소요 시간(분)"></label></td>
@@ -2012,7 +2020,7 @@
             </tbody>
           </table>
         </div>
-        <div class="performance-note"><strong>측정 원칙</strong><span>자료 준비부터 사람의 최종 검수까지 포함한 실제 시간을 입력합니다. 절감률은 효율 지표이며 결과의 정확성이나 법적 안전성을 보장하지 않습니다.</span></div>
+        <div class="performance-note"><strong>기록 원칙</strong><span>Week 1은 산출물과 완료 여부만 기록합니다. Week 2~4는 자료 준비부터 사람의 최종 검수까지 포함한 실제 시간을 입력하며, 절감률은 결과의 정확성이나 법적 안전성을 보장하지 않습니다.</span></div>
       </section>
     </section>
 
@@ -2276,7 +2284,7 @@
       </section>
     </section>
 
-    <footer class="footer">작성 기준일: 2026-07-22 · 리비전 v1.3 · 도시아재 · 브라우저 저장형 실행 대시보드</footer>
+    <footer class="footer">작성 기준일: 2026-07-23 · 리비전 v1.4 · 도시아재 · Google Sheets 연동 실행 대시보드</footer>
   </main>
 
   <dialog class="guide-dialog" id="dashboardGuide" aria-labelledby="guideTitle">
@@ -2357,7 +2365,12 @@
     <div class="guide-body">
       <ol class="revision-list">
         <li class="revision-entry revision-current">
-          <div class="revision-meta"><strong>v1.3</strong><time datetime="2026-07-22">2026-07-22</time><span>현재 버전</span></div>
+          <div class="revision-meta"><strong>v1.4</strong><time datetime="2026-07-23">2026-07-23</time><span>현재 버전</span></div>
+          <h3>Week 1 기획·구축형 사례를 성과 기록에 포함</h3>
+          <p>Week 1 산출물과 완료 여부를 4주 성과에 포함하고, 시간 절감 통계는 실제 업무를 실행하는 Week 2~4만 계산하도록 분리했습니다.</p>
+        </li>
+        <li class="revision-entry">
+          <div class="revision-meta"><strong>v1.3</strong><time datetime="2026-07-22">2026-07-22</time></div>
           <h3>GPTERS 디자인과 이미지 안정성 보강</h3>
           <p>GPTERS 브랜드 톤을 적용하고, 발표 이미지의 배포·로컬 경로를 분리했으며 리비전 관리 화면을 추가했습니다.</p>
         </li>

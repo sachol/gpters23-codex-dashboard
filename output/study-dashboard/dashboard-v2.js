@@ -373,12 +373,16 @@
     let artifacts = 0;
 
     performanceRows.forEach((row) => {
+      const measurementExcluded = row.dataset.measurement === "excluded";
       const before = Number(row.querySelector('[data-field="before"]')?.value);
       const after = Number(row.querySelector('[data-field="after"]')?.value);
       const result = row.querySelector("[data-result]");
       const bar = row.querySelector(".result-bar span");
-      const hasMeasurement = before > 0 && after >= 0;
-      if (hasMeasurement) {
+      const hasMeasurement = !measurementExcluded && before > 0 && after >= 0;
+      if (measurementExcluded) {
+        if (result) result.textContent = "정량 측정 제외";
+        if (bar) bar.style.width = "0%";
+      } else if (hasMeasurement) {
         const saved = before - after;
         const rate = Math.round((saved / before) * 100);
         measured += 1;
@@ -415,6 +419,7 @@
 
   document.getElementById("performanceReset")?.addEventListener("click", () => {
     performanceRows.forEach((row) => {
+      if (row.dataset.measurement === "excluded") return;
       row.querySelector('[data-field="before"]').value = "";
       row.querySelector('[data-field="after"]').value = "";
       row.querySelector('[data-field="artifacts"]').value = "0";
@@ -459,7 +464,7 @@
       ...candidateCards.flatMap((card) => [...card.querySelectorAll("[data-choice], [data-week], [data-candidate-meta]")])
     ];
     controls.forEach((control) => {
-      control.disabled = !enabled;
+      control.disabled = !enabled || control.hasAttribute("data-always-disabled");
       control.dataset.cloudEditable = "";
     });
     if (cloudSave) cloudSave.disabled = !enabled || cloudBusy || !cloudConfigured;

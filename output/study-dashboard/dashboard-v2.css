@@ -1959,12 +1959,15 @@ textarea:focus-visible,
 }
 
 .db-pipeline-step {
+  position: relative;
+  overflow: hidden;
   min-height: 142px;
   padding: 17px;
   border: 1px solid var(--border-soft);
   border-top: 4px solid var(--blue);
   border-radius: 8px;
   background: var(--surface);
+  cursor: help;
 }
 
 .db-pipeline-step:nth-of-type(2) {
@@ -2008,19 +2011,19 @@ textarea:focus-visible,
 }
 
 .db-pipeline.is-running .db-pipeline-step {
-  animation: db-step-pulse 720ms ease both;
+  animation: db-step-pulse 1150ms ease both;
 }
 
 .db-pipeline.is-running .db-pipeline-step:nth-of-type(2) {
-  animation-delay: 450ms;
+  animation-delay: 1100ms;
 }
 
 .db-pipeline.is-running .db-pipeline-step:nth-of-type(3) {
-  animation-delay: 900ms;
+  animation-delay: 2200ms;
 }
 
 .db-pipeline.is-running .db-pipeline-step:nth-of-type(4) {
-  animation-delay: 1350ms;
+  animation-delay: 3300ms;
 }
 
 @keyframes db-step-pulse {
@@ -2047,6 +2050,8 @@ textarea:focus-visible,
 }
 
 .db-table-tab {
+  position: relative;
+  overflow: hidden;
   min-height: 116px;
   padding: 15px;
   border: 1px solid var(--border-soft);
@@ -2055,6 +2060,49 @@ textarea:focus-visible,
   background: var(--surface);
   cursor: pointer;
   text-align: left;
+}
+
+.db-pipeline-step::after,
+.db-table-tab::after {
+  content: "비유로 이해하기\A" attr(data-analogy);
+  position: absolute;
+  z-index: 5;
+  inset: 7px;
+  display: grid;
+  place-content: center;
+  padding: 13px;
+  border: 1px solid var(--brand);
+  border-radius: 6px;
+  color: var(--ink);
+  background: var(--surface);
+  box-shadow: 0 8px 22px rgb(0 0 0 / 15%);
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.55;
+  letter-spacing: 0;
+  opacity: 0;
+  pointer-events: none;
+  text-align: left;
+  transform: scale(0.97);
+  transition: opacity 160ms ease, transform 160ms ease;
+  white-space: pre-line;
+}
+
+.db-pipeline-step:hover::after,
+.db-pipeline-step:focus::after,
+.db-pipeline-step:focus-visible::after,
+.db-table-tab:hover::after,
+.db-table-tab:focus::after,
+.db-table-tab:focus-visible::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.db-pipeline-step:focus-visible,
+.db-table-tab:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--brand) 25%, transparent);
+  outline-offset: 2px;
 }
 
 .db-table-tab > span,
@@ -2092,6 +2140,11 @@ textarea:focus-visible,
   color: var(--brand);
   background: var(--surface-selected);
   box-shadow: inset 0 3px 0 var(--brand);
+}
+
+.db-table-tab:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--brand) 25%, transparent);
+  outline-offset: 2px;
 }
 
 .db-table-panels {

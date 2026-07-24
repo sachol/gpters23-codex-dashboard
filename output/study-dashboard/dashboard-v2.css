@@ -1188,6 +1188,64 @@ h1 {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 14%, transparent);
 }
 
+.score-line.score-with-tooltip {
+  position: relative;
+  grid-template-columns: 58px minmax(0, 1fr);
+  row-gap: 3px;
+  margin: -3px -5px;
+  padding: 3px 5px;
+  border-radius: 5px;
+  cursor: help;
+}
+
+.score-line.score-with-tooltip:hover,
+.score-line.score-with-tooltip:focus-visible {
+  outline: none;
+  background: color-mix(in srgb, var(--brand) 8%, transparent);
+}
+
+.score-summary {
+  grid-column: 2;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.score-line.score-with-tooltip::after {
+  content: attr(data-score-tooltip);
+  position: absolute;
+  z-index: 30;
+  bottom: calc(100% + 7px);
+  left: 0;
+  box-sizing: border-box;
+  width: min(360px, 100%);
+  padding: 10px 11px;
+  border: 1px solid var(--brand);
+  border-radius: 6px;
+  color: var(--ink);
+  background: var(--surface);
+  box-shadow: var(--shadow-hover);
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.55;
+  letter-spacing: 0;
+  opacity: 0;
+  pointer-events: none;
+  text-align: left;
+  transform: translateY(4px);
+  transition: opacity 150ms ease, transform 150ms ease;
+  white-space: normal;
+}
+
+.score-line.score-with-tooltip:hover::after,
+.score-line.score-with-tooltip:focus::after,
+.score-line.score-with-tooltip:focus-visible::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .next-actions .num {
   color: #ffffff;
   background: var(--brand);

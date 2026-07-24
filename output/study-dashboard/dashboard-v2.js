@@ -170,17 +170,32 @@
   updateLoopDashboard();
 
   const candidateData = {
-    briefing: { domain: "brokerage", difficulty: 60, effect: 95, label: "중개업무" },
-    checklist: { domain: "brokerage", difficulty: 55, effect: 90, label: "중개업무" },
-    "ad-copy": { domain: "brokerage", difficulty: 35, effect: 88, label: "중개업무" },
-    "follow-up": { domain: "brokerage", difficulty: 35, effect: 85, label: "중개업무" },
-    "auction-docs": { domain: "auction", difficulty: 68, effect: 94, label: "법원경매" },
-    "auction-rights": { domain: "auction", difficulty: 82, effect: 92, label: "법원경매" },
-    "auction-bid-table": { domain: "auction", difficulty: 72, effect: 90, label: "법원경매" },
-    "lecture-outline": { domain: "education", difficulty: 45, effect: 92, label: "AI 강의" },
-    "prompt-kit": { domain: "education", difficulty: 42, effect: 90, label: "AI 강의" },
-    faq: { domain: "education", difficulty: 32, effect: 80, label: "AI 강의" }
+    briefing: { domain: "brokerage", difficulty: 60, effect: 95, difficultyParts: [15, 20, 10, 10, 5], effectParts: [30, 20, 20, 15, 10], label: "중개업무" },
+    checklist: { domain: "brokerage", difficulty: 55, effect: 90, difficultyParts: [12, 20, 8, 10, 5], effectParts: [25, 20, 20, 15, 10], label: "중개업무" },
+    "ad-copy": { domain: "brokerage", difficulty: 35, effect: 88, difficultyParts: [8, 8, 5, 9, 5], effectParts: [25, 20, 18, 15, 10], label: "중개업무" },
+    "follow-up": { domain: "brokerage", difficulty: 35, effect: 85, difficultyParts: [8, 7, 7, 8, 5], effectParts: [25, 20, 18, 12, 10], label: "중개업무" },
+    "auction-docs": { domain: "auction", difficulty: 68, effect: 94, difficultyParts: [18, 22, 8, 15, 5], effectParts: [28, 18, 20, 18, 10], label: "법원경매" },
+    "auction-rights": { domain: "auction", difficulty: 82, effect: 92, difficultyParts: [20, 25, 12, 18, 7], effectParts: [25, 17, 20, 20, 10], label: "법원경매" },
+    "auction-bid-table": { domain: "auction", difficulty: 72, effect: 90, difficultyParts: [18, 22, 12, 15, 5], effectParts: [25, 18, 20, 17, 10], label: "법원경매" },
+    "lecture-outline": { domain: "education", difficulty: 45, effect: 92, difficultyParts: [10, 5, 8, 12, 10], effectParts: [28, 18, 20, 16, 10], label: "AI 강의" },
+    "prompt-kit": { domain: "education", difficulty: 42, effect: 90, difficultyParts: [8, 6, 8, 10, 10], effectParts: [25, 20, 20, 15, 10], label: "AI 강의" },
+    faq: { domain: "education", difficulty: 32, effect: 80, difficultyParts: [6, 4, 5, 7, 10], effectParts: [20, 18, 18, 14, 10], label: "AI 강의" }
   };
+
+  const difficultyCriteria = [
+    ["입력자료", 25],
+    ["법률·수치 검증", 25],
+    ["외부 연결", 20],
+    ["예외·사람 검수", 20],
+    ["구축·유지관리", 10]
+  ];
+  const effectCriteria = [
+    ["시간 절감", 30],
+    ["월 반복성", 20],
+    ["품질 일관성", 20],
+    ["누락·오류 감소", 20],
+    ["사례·강의 확장", 10]
+  ];
 
   const candidateDetailKey = "gpters23-candidate-details-v1";
   const savedCandidateDetails = readJson(candidateDetailKey, {});
@@ -196,6 +211,30 @@
 
   const difficultyBand = (score) => score <= 40 ? "easy" : score <= 65 ? "medium" : "hard";
   const difficultyLabel = (score) => score <= 40 ? "쉬움" : score <= 65 ? "보통" : "높음";
+  const effectLabel = (score) => score >= 90 ? "매우 높음" : score >= 70 ? "높음" : score >= 40 ? "보통" : "낮음";
+  const scoreBreakdown = (criteria, parts) => criteria
+    .map(([label, maximum], index) => `${label} ${parts[index]}/${maximum}`)
+    .join(" · ");
+
+  function applyScoreTooltip(line, type, score, label, criteria, parts) {
+    if (!line) return;
+    const title = type === "difficulty" ? "예상 난이도" : "기대 효과";
+    const explanation = `${title} ${score}/100 · ${label} · 사전 예상치. ${scoreBreakdown(criteria, parts)}.`;
+    line.classList.add("score-with-tooltip");
+    line.tabIndex = 0;
+    line.dataset.scoreTooltip = explanation;
+    line.setAttribute("aria-label", explanation);
+    line.addEventListener("pointerenter", () => {
+      const activeScore = document.activeElement;
+      if (activeScore !== line && activeScore?.classList.contains("score-with-tooltip")) {
+        activeScore.blur();
+      }
+    });
+    const summary = document.createElement("small");
+    summary.className = "score-summary";
+    summary.textContent = `${score}/100 · ${label} · 예상치`;
+    line.appendChild(summary);
+  }
 
   candidateCards.forEach((card) => {
     const id = card.dataset.candidate;
@@ -203,6 +242,23 @@
     if (!meta) return;
     card.dataset.domain = meta.domain;
     card.dataset.difficulty = difficultyBand(meta.difficulty);
+    const scoreLines = card.querySelectorAll(".score-line");
+    applyScoreTooltip(
+      scoreLines[0],
+      "difficulty",
+      meta.difficulty,
+      difficultyLabel(meta.difficulty),
+      difficultyCriteria,
+      meta.difficultyParts
+    );
+    applyScoreTooltip(
+      scoreLines[1],
+      "effect",
+      meta.effect,
+      effectLabel(meta.effect),
+      effectCriteria,
+      meta.effectParts
+    );
     const savedDetail = savedCandidateDetails[id] || {};
     const details = document.createElement("div");
     details.className = "candidate-db-fields";
@@ -320,8 +376,8 @@
     const row = (label, getter) => `<tr><th scope="row">${label}</th>${compared.map((id) => `<td>${getter(id)}</td>`).join("")}</tr>`;
     compareTable.innerHTML = `<thead><tr><th scope="col">비교 기준</th>${headers}</tr></thead><tbody>
       ${row("업무 영역", (id) => candidateData[id].label)}
-      ${row("난이도", (id) => `<span class="compare-score">${difficultyLabel(candidateData[id].difficulty)} ${candidateData[id].difficulty}</span>`)}
-      ${row("기대 효과", (id) => `<span class="compare-score">${candidateData[id].effect}</span>`)}
+      ${row("난이도", (id) => `<span class="compare-score">${candidateData[id].difficulty}/100 · ${difficultyLabel(candidateData[id].difficulty)} · 예상치</span>`)}
+      ${row("기대 효과", (id) => `<span class="compare-score">${candidateData[id].effect}/100 · ${effectLabel(candidateData[id].effect)} · 예상치</span>`)}
       ${row("배치 주차", (id) => {
         const value = document.querySelector(`[data-week="${id}"]`)?.value;
         return value ? value.replace("week", "Week ") : "미정";

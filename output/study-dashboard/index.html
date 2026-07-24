@@ -1343,6 +1343,7 @@
         <li><button class="tab-button" type="button" data-target="candidates">자동화 후보</button></li>
         <li><button class="tab-button" type="button" data-target="performance">성과 기록</button></li>
         <li><button class="tab-button" type="button" data-target="weekly-routine">실행 루프</button></li>
+        <li><button class="tab-button" type="button" data-target="data-story">DB 설계</button></li>
         <li><button class="tab-button" type="button" data-target="benchmark">벤치마킹</button></li>
         <li><button class="tab-button" type="button" data-target="artifacts">문서</button></li>
       </ul>
@@ -2220,6 +2221,221 @@
       </section>
     </section>
 
+    <section id="data-story" class="dashboard-section">
+      <section class="db-story-shell" id="dbStory" aria-labelledby="dbStoryTitle">
+        <header class="db-story-header">
+          <div>
+            <span class="section-kicker">ONE SAVE · THREE TABLES · FOUR WEEKS</span>
+            <h2 id="dbStoryTitle">DB는 보이지 않는 두 번째 대시보드입니다</h2>
+            <p>화면은 오늘의 상태를 보여주고, DB는 선택과 변화의 이유를 기억합니다. 한 번의 관리자 저장으로 현재 진행상황, 자동화 후보, 수정 이력이 각자의 역할에 맞게 분리됩니다.</p>
+          </div>
+          <div class="db-story-actions">
+            <button id="dbReplay" class="db-action-button" type="button" title="저장 버튼을 누른 뒤 데이터가 이동하는 순서를 재생합니다.">
+              <span aria-hidden="true">↻</span><span>저장 흐름 재생</span>
+            </button>
+            <button id="dbPresent" class="db-action-button db-action-primary" type="button" aria-pressed="false" title="DB 설계 화면만 전체화면으로 표시합니다.">
+              <span aria-hidden="true">⛶</span><span>발표 모드</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="db-thesis-band">
+          <div class="db-thesis-copy">
+            <span>설계의 핵심</span>
+            <strong>현재값과 변경 이력을 분리하면<br>프로젝트가 기억을 갖게 됩니다.</strong>
+            <p>무엇을 했는지만 저장하지 않고, 무엇이 바뀌었고 다음에 무엇을 할지도 함께 남깁니다.</p>
+          </div>
+          <div class="db-proof" aria-label="Week 1 데이터 저장 결과">
+            <div><span>WEEK 1</span><strong>6/6</strong><small>실행 루프 완료</small></div>
+            <div><span>산출물</span><strong>2</strong><small>대시보드·사례글</small></div>
+            <div><span>리비전</span><strong>2</strong><small>현재 행 버전</small></div>
+          </div>
+        </div>
+
+        <section class="db-story-band" aria-labelledby="dbPipelineTitle">
+          <div class="db-band-heading">
+            <div>
+              <span>DATA PIPELINE</span>
+              <h3 id="dbPipelineTitle">버튼 한 번이 기록 시스템으로 바뀌는 순간</h3>
+            </div>
+            <strong id="dbReplayStatus" aria-live="polite">저장 준비</strong>
+          </div>
+          <div class="db-pipeline" id="dbPipeline">
+            <article class="db-pipeline-step" data-db-step="1">
+              <span>01</span><strong>대시보드 입력</strong><p>체크·결과·피드백·다음 실험</p>
+            </article>
+            <div class="db-pipeline-arrow" aria-hidden="true">→</div>
+            <article class="db-pipeline-step" data-db-step="2">
+              <span>02</span><strong>관리자 검증</strong><p>승인된 변경만 저장 요청</p>
+            </article>
+            <div class="db-pipeline-arrow" aria-hidden="true">→</div>
+            <article class="db-pipeline-step" data-db-step="3">
+              <span>03</span><strong>Apps Script</strong><p>현재값 갱신·차이 비교</p>
+            </article>
+            <div class="db-pipeline-arrow" aria-hidden="true">→</div>
+            <article class="db-pipeline-step" data-db-step="4">
+              <span>04</span><strong>Google Sheets</strong><p>상태·후보·이력 분리 저장</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="db-story-band" aria-labelledby="dbTablesTitle">
+          <div class="db-band-heading">
+            <div>
+              <span>THREE-TABLE MODEL</span>
+              <h3 id="dbTablesTitle">같은 데이터를 세 가지 질문으로 나눴습니다</h3>
+            </div>
+            <p>필드에 마우스를 올리면 저장 의미를 확인할 수 있습니다.</p>
+          </div>
+
+          <div class="db-table-tabs" role="tablist" aria-label="Google Sheets DB 테이블">
+            <button class="db-table-tab active" type="button" role="tab" aria-selected="true" aria-controls="dbPanelWeekly" data-db-table="weekly">
+              <span>현재</span><strong>weekly_progress</strong><small>이번 주는 어디까지 왔나</small>
+            </button>
+            <button class="db-table-tab" type="button" role="tab" aria-selected="false" aria-controls="dbPanelCandidates" data-db-table="candidates">
+              <span>선택</span><strong>candidate_choices</strong><small>무엇을 다음 사례로 할까</small>
+            </button>
+            <button class="db-table-tab" type="button" role="tab" aria-selected="false" aria-controls="dbPanelRevision" data-db-table="revision">
+              <span>이력</span><strong>revision_history</strong><small>어떤 값이 왜 바뀌었나</small>
+            </button>
+          </div>
+
+          <div class="db-table-panels">
+            <article class="db-table-panel active" id="dbPanelWeekly" role="tabpanel" data-db-panel="weekly">
+              <div class="db-panel-intro">
+                <div><span>한 행의 단위</span><strong>한 주차</strong></div>
+                <p>계획부터 다음 실험까지 4주 운영의 현재 상태를 저장합니다. 대시보드의 실행 루프와 성과 기록이 이 값을 읽습니다.</p>
+                <code>week1 · 6/6 · 산출물 2 · 완료</code>
+              </div>
+              <div class="db-field-cloud" aria-label="weekly_progress 필드">
+                <button type="button" data-tooltip="주차를 연결하는 고유번호">week_id</button>
+                <button type="button" data-tooltip="해당 주차의 정규 수업일">session_date</button>
+                <button type="button" data-tooltip="그 주에 실행할 사례 주제">topic</button>
+                <button type="button" data-tooltip="업무·기능·성공 기준 계획 완료 여부">task_plan</button>
+                <button type="button" data-tooltip="Codex 실제 적용과 산출물 제작 여부">task_execute</button>
+                <button type="button" data-tooltip="챌린지 사이트 과제 인증 여부">task_challenge</button>
+                <button type="button" data-tooltip="GPTERS 사례글 작성·게시 여부">task_post</button>
+                <button type="button" data-tooltip="발표와 피어 피드백 단계 완료 여부">task_feedback</button>
+                <button type="button" data-tooltip="다음 실험 주제와 입력자료 확정 여부">task_expand</button>
+                <button type="button" data-tooltip="실제로 만든 결과물과 실행 내용">result</button>
+                <button type="button" data-tooltip="검증 결과·오류·수정·발표 반응">feedback</button>
+                <button type="button" data-tooltip="다음 주 실험과 측정 계획">next_experiment</button>
+                <button type="button" data-tooltip="기존 수작업의 실제 소요 시간">before_minutes</button>
+                <button type="button" data-tooltip="Codex 적용 후 검수 포함 소요 시간">after_minutes</button>
+                <button type="button" data-tooltip="해당 사례에서 완성한 결과물 개수">artifacts_count</button>
+                <button type="button" data-tooltip="해당 주차 사례의 최종 완료 여부">case_done</button>
+                <button type="button" data-tooltip="가장 최근 저장 시각">updated_at</button>
+                <button type="button" data-tooltip="해당 주차 행의 현재 버전 번호">revision_no</button>
+              </div>
+            </article>
+
+            <article class="db-table-panel" id="dbPanelCandidates" role="tabpanel" data-db-panel="candidates" hidden>
+              <div class="db-panel-intro">
+                <div><span>한 행의 단위</span><strong>자동화 후보 하나</strong></div>
+                <p>당장 실행하지 않은 아이디어까지 보존하고, 선택 여부와 배정 주차를 독립적으로 관리합니다.</p>
+                <code>briefing · brokerage · selected · week2</code>
+              </div>
+              <div class="db-field-cloud" aria-label="candidate_choices 필드">
+                <button type="button" data-tooltip="자동화 후보를 구분하는 고유번호">candidate_id</button>
+                <button type="button" data-tooltip="수강생에게 보여줄 자동화 업무명">candidate_name</button>
+                <button type="button" data-tooltip="중개·경매·교육 업무 영역">domain</button>
+                <button type="button" data-tooltip="실제 사례로 선택했는지 여부">selected</button>
+                <button type="button" data-tooltip="실행할 예정 주차">assigned_week</button>
+                <button type="button" data-tooltip="기존 업무의 회당 예상 시간">estimated_minutes</button>
+                <button type="button" data-tooltip="한 달 동안 반복되는 예상 횟수">monthly_frequency</button>
+                <button type="button" data-tooltip="외부 공개 사례로 만들 수 있는지 여부">public_case</button>
+                <button type="button" data-tooltip="후보 정보의 마지막 수정 시각">updated_at</button>
+              </div>
+            </article>
+
+            <article class="db-table-panel" id="dbPanelRevision" role="tabpanel" data-db-panel="revision" hidden>
+              <div class="db-panel-intro">
+                <div><span>한 행의 단위</span><strong>바뀐 필드 하나</strong></div>
+                <p>현재값을 덮어써도 이전 값은 사라지지 않습니다. 변경 전후와 저장 원인을 시간순으로 누적합니다.</p>
+                <code>artifacts_count · 0 → 2 · office-chrome</code>
+              </div>
+              <div class="db-field-cloud" aria-label="revision_history 필드">
+                <button type="button" data-tooltip="변경 한 건의 고유번호">revision_id</button>
+                <button type="button" data-tooltip="변경사항이 저장된 시각">changed_at</button>
+                <button type="button" data-tooltip="weekly·candidate·system 구분">section</button>
+                <button type="button" data-tooltip="week1·briefing 등 변경된 행의 ID">record_id</button>
+                <button type="button" data-tooltip="실제로 변경된 필드명">field_name</button>
+                <button type="button" data-tooltip="저장 직전의 기존 값">old_value</button>
+                <button type="button" data-tooltip="새롭게 반영된 값">new_value</button>
+                <button type="button" data-tooltip="저장 요청의 논리적 작업 환경">device_label</button>
+                <button type="button" data-tooltip="대시보드 저장 등 변경 원인">change_note</button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="db-story-band" aria-labelledby="dbRelationTitle">
+          <div class="db-band-heading">
+            <div>
+              <span>RELATIONSHIP</span>
+              <h3 id="dbRelationTitle">현재·선택·이력을 분리한 이유</h3>
+            </div>
+          </div>
+          <div class="db-relation-map" aria-label="세 테이블의 관계">
+            <article><span>아이디어 풀</span><strong>candidate_choices</strong><p>10개 후보 중 실행할 주제와 주차를 선택</p></article>
+            <div aria-hidden="true">선택·배정 →</div>
+            <article><span>운영 현황</span><strong>weekly_progress</strong><p>4주 실행 루프와 성과의 최신 상태를 유지</p></article>
+            <div aria-hidden="true">모든 변경 →</div>
+            <article><span>감사 기록</span><strong>revision_history</strong><p>이전 값과 새 값을 필드 단위로 계속 누적</p></article>
+          </div>
+        </section>
+
+        <section class="db-story-band db-change-band" aria-labelledby="dbChangeTitle">
+          <div class="db-band-heading">
+            <div>
+              <span>REAL WEEK 1 TRACE</span>
+              <h3 id="dbChangeTitle">“완료했습니다”가 아니라, 무엇이 바뀌었는지 남겼습니다</h3>
+            </div>
+          </div>
+          <div class="db-change-grid">
+            <div class="db-state-snapshot before">
+              <span>저장 전</span>
+              <div><code>artifacts_count</code><strong>0</strong></div>
+              <div><code>case_done</code><strong>FALSE</strong></div>
+            </div>
+            <div class="db-save-moment" aria-hidden="true">
+              <span>변경사항 저장</span><strong>→</strong><small>차이가 있는 필드만 기록</small>
+            </div>
+            <div class="db-state-snapshot after">
+              <span>저장 후</span>
+              <div><code>artifacts_count</code><strong>2</strong></div>
+              <div><code>case_done</code><strong>TRUE</strong></div>
+            </div>
+            <div class="db-revision-receipt">
+              <span>자동 생성된 변경 영수증</span>
+              <div><code>week1 · artifacts_count</code><strong>0 → 2</strong></div>
+              <div><code>week1 · case_done</code><strong>FALSE → TRUE</strong></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="db-story-band" aria-labelledby="dbScaleTitle">
+          <div class="db-band-heading">
+            <div>
+              <span>REUSABLE PATTERN</span>
+              <h3 id="dbScaleTitle">이 구조는 이번 스터디가 끝나도 남습니다</h3>
+            </div>
+          </div>
+          <div class="db-scale-grid">
+            <article><span>01</span><strong>현재 상태</strong><p>프로젝트가 지금 어디에 있는지 한 행으로 확인합니다.</p></article>
+            <article><span>02</span><strong>선택 기준</strong><p>아이디어를 버리지 않고 우선순위와 실행 시점을 관리합니다.</p></article>
+            <article><span>03</span><strong>변경 이력</strong><p>실패·수정·성장을 사례와 발표의 근거로 바꿉니다.</p></article>
+            <article><span>04</span><strong>다기기 운영</strong><p>회사·집·노트북이 하나의 중앙 기록을 함께 사용합니다.</p></article>
+          </div>
+        </section>
+
+        <footer class="db-story-footer">
+          <span>발표 핵심 한 문장</span>
+          <strong>“저는 대시보드를 만든 것이 아니라, 4주 동안 제 선택과 성장을 기억하는 시스템을 만들었습니다.”</strong>
+        </footer>
+      </section>
+    </section>
+
     <section id="benchmark" class="dashboard-section">
       <section class="panel">
         <h2>이전 기수에서 가져올 좋은 점</h2>
@@ -2284,7 +2500,7 @@
       </section>
     </section>
 
-    <footer class="footer">작성 기준일: 2026-07-23 · 리비전 v1.4 · 도시아재 · Google Sheets 연동 실행 대시보드</footer>
+    <footer class="footer">작성 기준일: 2026-07-24 · 리비전 v1.5 · 도시아재 · Google Sheets 연동 실행 대시보드</footer>
   </main>
 
   <dialog class="guide-dialog" id="dashboardGuide" aria-labelledby="guideTitle">
@@ -2319,6 +2535,7 @@
           <div class="guide-menu-row"><strong>자동화 후보</strong><p>중개 4개·경매 3개·AI 교육 3개 중 실험할 업무를 고릅니다.</p></div>
           <div class="guide-menu-row"><strong>성과 기록</strong><p>Before/After 시간과 산출물을 입력해 자동화 효과를 검증합니다.</p></div>
           <div class="guide-menu-row"><strong>실행 루프</strong><p>업무 적용, 인증, 사례글, 발표 피드백과 다음 실험을 체크하고 기록합니다.</p></div>
+          <div class="guide-menu-row"><strong>DB 설계</strong><p>현재 상태·자동화 후보·변경 이력이 한 번의 저장으로 연결되는 구조를 발표 화면으로 확인합니다.</p></div>
           <div class="guide-menu-row"><strong>벤치마킹</strong><p>이전 우수 사례에서 가져온 운영 원칙과 차별점을 확인합니다.</p></div>
           <div class="guide-menu-row"><strong>문서</strong><p>과제, 실험 근거, 발표자료와 실행 지시서를 HTML로 읽습니다.</p></div>
         </div>
@@ -2365,7 +2582,12 @@
     <div class="guide-body">
       <ol class="revision-list">
         <li class="revision-entry revision-current">
-          <div class="revision-meta"><strong>v1.4</strong><time datetime="2026-07-23">2026-07-23</time><span>현재 버전</span></div>
+          <div class="revision-meta"><strong>v1.5</strong><time datetime="2026-07-24">2026-07-24</time><span>현재 버전</span></div>
+          <h3>Google Sheets DB 설계 발표 화면 추가</h3>
+          <p>3개 테이블의 역할, 필드 툴팁, 저장 흐름, 실제 Week 1 변경 이력과 전체화면 발표 모드를 추가했습니다.</p>
+        </li>
+        <li class="revision-entry">
+          <div class="revision-meta"><strong>v1.4</strong><time datetime="2026-07-23">2026-07-23</time></div>
           <h3>Week 1 기획·구축형 사례를 성과 기록에 포함</h3>
           <p>Week 1 산출물과 완료 여부를 4주 성과에 포함하고, 시간 절감 통계는 실제 업무를 실행하는 Week 2~4만 계산하도록 분리했습니다.</p>
         </li>
@@ -2488,6 +2710,70 @@
     });
 
     activateSection(location.hash.replace("#", ""));
+
+    const dbTableTabs = Array.from(document.querySelectorAll("[data-db-table]"));
+    const dbTablePanels = Array.from(document.querySelectorAll("[data-db-panel]"));
+
+    dbTableTabs.forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = button.dataset.dbTable;
+        dbTableTabs.forEach((item) => {
+          const isActive = item === button;
+          item.classList.toggle("active", isActive);
+          item.setAttribute("aria-selected", String(isActive));
+        });
+        dbTablePanels.forEach((panel) => {
+          const isActive = panel.dataset.dbPanel === target;
+          panel.classList.toggle("active", isActive);
+          panel.hidden = !isActive;
+        });
+      });
+    });
+
+    const dbReplay = document.getElementById("dbReplay");
+    const dbPipeline = document.getElementById("dbPipeline");
+    const dbReplayStatus = document.getElementById("dbReplayStatus");
+    let dbReplayTimer;
+
+    dbReplay?.addEventListener("click", () => {
+      clearTimeout(dbReplayTimer);
+      dbPipeline?.classList.remove("is-running");
+      void dbPipeline?.offsetWidth;
+      dbPipeline?.classList.add("is-running");
+      dbReplayStatus.textContent = "3개 테이블에 저장 중";
+      dbReplay.disabled = true;
+      dbReplayTimer = setTimeout(() => {
+        dbPipeline?.classList.remove("is-running");
+        dbReplayStatus.textContent = "현재·선택·이력 저장 완료";
+        dbReplay.disabled = false;
+      }, 2300);
+    });
+
+    const dbStory = document.getElementById("dbStory");
+    const dbPresent = document.getElementById("dbPresent");
+
+    function syncDbPresentButton() {
+      if (!dbPresent) return;
+      const isPresenting = document.fullscreenElement === dbStory;
+      dbPresent.setAttribute("aria-pressed", String(isPresenting));
+      const parts = dbPresent.querySelectorAll("span");
+      if (parts[0]) parts[0].textContent = isPresenting ? "×" : "⛶";
+      if (parts[1]) parts[1].textContent = isPresenting ? "발표 종료" : "발표 모드";
+    }
+
+    dbPresent?.addEventListener("click", async () => {
+      try {
+        if (document.fullscreenElement === dbStory) {
+          await document.exitFullscreen();
+        } else {
+          await dbStory?.requestFullscreen();
+        }
+      } catch {
+        dbPresent.title = "이 브라우저에서는 전체화면 발표 모드를 사용할 수 없습니다.";
+      }
+    });
+
+    document.addEventListener("fullscreenchange", syncDbPresentButton);
 
     const isFilePage = location.protocol === "file:";
     const dashboardBase = isFilePage ? "" : "/output/study-dashboard/";

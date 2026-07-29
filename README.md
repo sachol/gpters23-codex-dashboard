@@ -1,10 +1,26 @@
 # GPTERS 23기 Codex 앱 스터디 운영본부
 
-공인중개사 신화의 4주 Codex 앱 스터디 실행 공간입니다. 목표는 단순 실습 기록이 아니라, 실제 중개 실무에 반복해서 쓰는 개인용 에이전트 시스템을 완성하고 GPTERS 사례글과 발표 자료까지 남기는 것입니다.
+현직 공인중개사이자 법원경매 사업장 운영자, 공인중개사용 AI 실무 강사인 도시아재(신화)의 4주 Codex 앱 스터디 실행 공간입니다. 목표는 단순 실습 기록이 아니라, 실제 중개·경매·AI 교육 업무에 반복해서 쓰는 개인용 에이전트 시스템을 완성하고 GPTERS 사례글과 발표 자료까지 남기는 것입니다.
 
 ## 장기 목표
 
-GPTERS 23기 Codex 앱 4주 스터디 동안 공인중개사 업무 자동화 에이전트 시스템을 기획, 실행, 기록하여 최종 사례글과 발표 자료까지 완성합니다.
+GPTERS 23기 Codex 앱 4주 스터디 동안 공인중개사 업무 자동화 에이전트 시스템을 계획, 실행, 검증, 확장하여 최종 사례글과 발표 자료까지 완성합니다.
+
+## 현재 운영 구조
+
+1. `GitHub`: 소스 코드, 문서와 변경 이력 관리
+2. `Vercel`: 실행 대시보드 배포
+3. `Google Apps Script`: 대시보드와 Google Sheets 사이의 안전한 저장 중계
+4. `Google Sheets DB`: 주차별 진행, 자동화 후보와 리비전 이력 관리
+
+대시보드의 체크와 메모는 브라우저에 임시 저장되며, 관리자 모드에서 `변경사항 저장`을 누르면 Google Sheets DB에 반영됩니다.
+
+## 현재 진행 상황 (2026-07-29)
+
+- Week 1: `6/6` 완료 - 4주 실행 대시보드 기획·제작·배포·DB 연동과 사례글 작성
+- Week 2: `2/6` 진행 - 공부서류 기반 매물 브리핑 자동화를 위한 계획과 Skill·Plugin·MCP 적용 준비
+- Week 3: 법원경매 사건서류 검토 보조 예정
+- Week 4: 검증된 기능을 에이전트 시스템과 AI 교육 자산으로 통합 예정
 
 ## 과정 일정
 
@@ -31,10 +47,21 @@ GPTERS 23기 Codex 앱 4주 스터디 동안 공인중개사 업무 자동화 �
 
 ## Vercel 상태
 
-- Vercel CLI 설치 완료: `54.20.1`
+- Vercel CLI 설치 완료: `55.0.0`
 - 로그인 계정: `sachol`
 - 실행 경로: `C:\Users\pc\AppData\Roaming\npm\vercel.cmd`
 - Node.js: `24.14.0`
+- Codex CLI: `0.145.0`
+- GitHub 저장소: `sachol/gpters23-codex-dashboard` (`main`)
+- 프로덕션: GitHub `main` 브랜치와 Vercel 연동
+
+## 보안 및 데이터 원칙
+
+- 관리자 비밀번호, API Secret과 Google Sheets 원본 URL은 GitHub에 커밋하지 않습니다.
+- 부동산 공부서류는 개인정보를 제거한 비식별 자료만 실험에 사용합니다.
+- 고객 전달 문구와 중개사 내부 검수 메모를 분리합니다.
+- 건축물대장, 등기부, 토지이용계획과 실거래가 자료 간 충돌은 숨기지 않고 `확인 필요`로 표시합니다.
+- AI가 만든 수치·법적 표현은 공인중개사가 원문과 교차검증합니다.
 
 ## 매일 시작 프롬프트
 
@@ -78,7 +105,7 @@ GPTERS 23기 Codex 앱 4주 스터디 동안 공인중개사 업무 자동화 �
 - `output/gpters-case-study/images/goal-alignment-board.png`: 목표 대비 현재 정렬 상태 이미지
 - `samples/property-briefing-sample-input.md`: 비식별 샘플 매물 입력자료
 - `output/property-briefing-sample/briefing-v0.md`: 샘플 브리핑 출력 예시
-- `output/study-dashboard/index.html`: 4주 진행 상황 정적 대시보드
+- `output/study-dashboard/index.html`: Vercel·Google Sheets와 연동된 4주 실행 대시보드
 - `output/study-dashboard/document-center.html`: 주요 문서 HTML 문서센터
 - `output/final-presentation/index.html`: 3분 발표용 HTML 슬라이드
 - `output/final-presentation/speaker-notes.md`: 3분 발표 대본 초안

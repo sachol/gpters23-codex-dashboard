@@ -178,6 +178,17 @@ h1 {
   border-left-color: var(--amber);
 }
 
+.sample-warning {
+  margin: 18px 0;
+  padding: 14px 18px;
+  color: #7c2d12;
+  background: #fff7ed;
+  border: 2px solid #f97316;
+  border-radius: 12px;
+  font-weight: 800;
+  text-align: center;
+}
+
 .step-nav {
   display: flex;
   gap: 8px;
@@ -681,6 +692,8 @@ footer {
   .notice,
   .step-nav,
   #step-1,
+  #step-2,
+  #step-3,
   #step-5,
   footer {
     display: none !important;

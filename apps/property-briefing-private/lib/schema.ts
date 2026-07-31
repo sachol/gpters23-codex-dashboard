@@ -12,6 +12,7 @@ import {
   type TimerEntry,
 } from "./types.ts";
 import { BUYER_PURPOSES, PROPERTY_GROUPS } from "./domain.ts";
+import { EXECUTION_MODES } from "./domain.ts";
 
 const MAX_BODY_BYTES = 500_000;
 const STATUS_SET = new Set(EVIDENCE_STATUSES);
@@ -221,6 +222,10 @@ export function parseCaseState(value: unknown): CaseState {
     schemaVersion: 1,
     case: {
       caseId: textValue(caseValue.caseId, "케이스 ID", 120),
+      executionMode:
+        caseValue.executionMode === undefined
+          ? "실제 사건 모드"
+          : oneOf(caseValue.executionMode, EXECUTION_MODES, "실행 모드"),
       propertyGroup,
       propertySubtype: textValue(caseValue.propertySubtype, "세부유형", 120),
       propertySubtypeCustom: textValue(

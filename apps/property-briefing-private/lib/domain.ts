@@ -1,5 +1,6 @@
 import {
   type CaseState,
+  type ExecutionMode,
   type EvidenceStatus,
   type LeaseComparison,
   type PropertyGroup,
@@ -33,6 +34,11 @@ export const BUYER_PURPOSES = [
   "개발·리모델링 검토",
   "장기보유",
   "기타",
+];
+
+export const EXECUTION_MODES: ExecutionMode[] = [
+  "실제 사건 모드",
+  "비식별 샘플 테스트 모드",
 ];
 
 export const TIMER_STAGES = [
@@ -77,6 +83,10 @@ export function isoNow(): string {
 
 export function today(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+export function createSampleCaseId(date = today(), sequence = 1): string {
+  return `sample-${date.replaceAll("-", "")}-${String(sequence).padStart(2, "0")}`;
 }
 
 export function createLease(): LeaseComparison {
@@ -124,12 +134,18 @@ export function createReviewGates(): ReviewGate[] {
   ];
 }
 
-export function createEmptyState(): CaseState {
+export function createEmptyState(
+  executionMode: ExecutionMode = "실제 사건 모드",
+): CaseState {
   const now = isoNow();
   return {
     schemaVersion: 1,
     case: {
-      caseId: createId("case"),
+      caseId:
+        executionMode === "비식별 샘플 테스트 모드"
+          ? createSampleCaseId()
+          : createId("case"),
+      executionMode,
       propertyGroup: "상업업무",
       propertySubtype: "상가·빌딩",
       propertySubtypeCustom: "",
@@ -169,6 +185,10 @@ export function normalizeCaseState(state: CaseState): CaseState {
     case: {
       ...defaults.case,
       ...state.case,
+      executionMode:
+        state.case.executionMode === "비식별 샘플 테스트 모드"
+          ? "비식별 샘플 테스트 모드"
+          : "실제 사건 모드",
       secondaryBuyerPurpose: state.case.secondaryBuyerPurpose ?? "",
     },
     outputs: {
@@ -318,7 +338,17 @@ export function validateGateOrder(gates: ReviewGate[]): ValidationIssue[] {
 
 export function validateState(state: CaseState): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
-  if (!state.case.address.trim()) {
+  const isSample =
+    state.case.executionMode === "비식별 샘플 테스트 모드";
+  if (isSample) {
+    issues.push({
+      field: "case.executionMode",
+      message:
+        "샘플 테스트는 가상·교육용입니다. 비공개 DB 저장·공개 요약·고객 제공을 할 수 없습니다.",
+      severity: "warning",
+    });
+  }
+  if (!isSample && !state.case.address.trim()) {
     issues.push({
       field: "case.address",
       message: "실제 업무용 주소를 입력하세요. 공개 요약에는 포함되지 않습니다.",
@@ -335,14 +365,17 @@ export function validateState(state: CaseState): ValidationIssue[] {
       severity: "error",
     });
   }
-  if (!state.case.maskedFolderId.trim()) {
+  if (!isSample && !state.case.maskedFolderId.trim()) {
     issues.push({
       field: "case.maskedFolderId",
       message: "원본이 아닌 자동화용 마스킹 폴더 ID가 필요합니다.",
       severity: "error",
     });
   }
-  if (!state.case.consentDate || !state.case.consentScope.trim()) {
+  if (
+    !isSample &&
+    (!state.case.consentDate || !state.case.consentScope.trim())
+  ) {
     issues.push({
       field: "case.consent",
       message: "자료 처리 동의일과 동의 범위를 기록하세요.",
@@ -407,10 +440,19 @@ export function qualityPass(state: CaseState): boolean {
   );
 }
 
+export function canPersistExternally(state: CaseState): boolean {
+  return state.case.executionMode === "실제 사건 모드";
+}
+
 export function createPublicationSummary(
   state: CaseState,
   learning = "",
 ): PublicationSummary {
+  if (!canPersistExternally(state)) {
+    throw new Error(
+      "가상 샘플은 비공개 DB 저장 또는 공개 요약 전송을 할 수 없습니다.",
+    );
+  }
   const before = timerTotals(state.timers, "before");
   const after = timerTotals(state.timers, "after");
   const beforeTimers = state.timers.filter((timer) => timer.mode === "before");
@@ -458,18 +500,37 @@ export function createCodexPrompt(state: CaseState): string {
     state.case.propertySubtype === "기타"
       ? state.case.propertySubtypeCustom
       : state.case.propertySubtype;
+  const isSample =
+    state.case.executionMode === "비식별 샘플 테스트 모드";
   return [
+    isSample
+      ? "가상 샘플·미검증·고객 제공 금지"
+      : "실제 사건 모드·비공개 업무용",
+    "",
     "Use $property-briefing.",
     "",
+    `실행 모드: ${state.case.executionMode}`,
     `case_id: ${state.case.caseId}`,
     `매물 유형: ${state.case.propertyGroup} / ${subtype}`,
     `거래 유형: ${state.case.transactionType}`,
+    `주소 (비공개): ${state.case.address || "자료 없음"}`,
+    `매도 희망가: ${
+      state.case.askingPrice === null
+        ? "자료 없음"
+        : `${state.case.askingPrice}원`
+    }`,
     `주요 매수 목적: ${state.case.buyerPurpose}`,
     `보조 매수 목적: ${state.case.secondaryBuyerPurpose || "없음"}`,
-    `자동화용 마스킹 Drive 폴더 ID: ${state.case.maskedFolderId}`,
+    `자동화용 마스킹 Drive 폴더 ID: ${
+      state.case.maskedFolderId || "자료 없음"
+    }`,
+    `자료 처리 동의일: ${state.case.consentDate || "자료 없음"}`,
+    `동의 범위: ${state.case.consentScope || "자료 없음"}`,
     `임대차계약서 수: ${state.leases.length}`,
     "",
-    "원본 Drive 폴더에는 접근하지 말고 위 마스킹 폴더의 비식별 자료만 사용하세요.",
+    isSample
+      ? "외부 조회·비공개 DB 저장·공개 요약·고객 제공을 하지 말고, 입력된 가상 자료만으로 조건부 초안을 작성하세요."
+      : "원본 Drive 폴더에는 접근하지 말고 위 마스킹 폴더의 비식별 자료만 사용하세요.",
     "건축물대장, 등기사항전부증명서, 토지이용계획, 실거래, 임대차계약서를 출처별로 교차검증하세요.",
     "충돌 시 원문 값과 최신 조회값을 병렬 표시하고 값을 덮어쓰지 마세요.",
     "확인되지 않은 항목은 자료 없음 / 추가 확인 필요 / 기준일 경과 / 불일치 / 판독 불가로 구분하세요.",

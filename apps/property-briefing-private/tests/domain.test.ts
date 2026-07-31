@@ -2,10 +2,12 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  canPersistExternally,
   createCodexPrompt,
   createEmptyState,
   createLease,
   createPublicationSummary,
+  createSampleCaseId,
   depositAdjustedRentalYield,
   detectGuaranteePhrases,
   detectPersonalData,
@@ -76,19 +78,58 @@ test("매매가 기준과 보증금 차감 기준 임대수익률을 구분한�
 
 test("주목적과 보조목적을 실행 프롬프트에 분리하고 기존 저장본을 보정한다", () => {
   const state = createEmptyState();
+  state.case.address = "서울시 비공개 주소";
+  state.case.askingPrice = 7_500_000_000;
   state.case.buyerPurpose = "임대수익";
   state.case.secondaryBuyerPurpose = "자산가치";
+  state.case.maskedFolderId = "masked-folder-id";
+  state.case.consentDate = "2026-07-31";
+  state.case.consentScope = "비식별 자료를 조건부 초안 작성에 사용";
   const prompt = createCodexPrompt(state);
+  assert.match(prompt, /실제 사건 모드·비공개 업무용/);
+  assert.match(prompt, /실행 모드: 실제 사건 모드/);
+  assert.match(prompt, /주소 \(비공개\): 서울시 비공개 주소/);
+  assert.match(prompt, /매도 희망가: 7500000000원/);
   assert.match(prompt, /주요 매수 목적: 임대수익/);
   assert.match(prompt, /보조 매수 목적: 자산가치/);
+  assert.match(prompt, /자료 처리 동의일: 2026-07-31/);
+  assert.match(prompt, /동의 범위: 비식별 자료를 조건부 초안 작성에 사용/);
 
   const legacy = structuredClone(state);
+  delete (legacy.case as Partial<typeof legacy.case>).executionMode;
   delete (legacy.case as Partial<typeof legacy.case>).secondaryBuyerPurpose;
   delete (legacy.outputs as Partial<typeof legacy.outputs>).assetValueEvidence;
   const normalized = normalizeCaseState(legacy);
+  assert.equal(normalized.case.executionMode, "실제 사건 모드");
   assert.equal(normalized.case.secondaryBuyerPurpose, "");
   assert.equal(normalized.outputs.assetValueEvidence, "");
+  assert.equal(parseCaseState(legacy).case.executionMode, "실제 사건 모드");
   assert.equal(parseCaseState(legacy).case.secondaryBuyerPurpose, "");
+});
+
+test("샘플 모드는 경고 문구와 표준 case_id를 사용하고 외부 저장을 차단한다", () => {
+  const state = createEmptyState("비식별 샘플 테스트 모드");
+  assert.match(state.case.caseId, /^sample-\d{8}-01$/);
+  state.case.caseId = createSampleCaseId("2026-07-31", 2);
+  const prompt = createCodexPrompt(state);
+
+  assert.equal(state.case.caseId, "sample-20260731-02");
+  assert.match(prompt, /^가상 샘플·미검증·고객 제공 금지/);
+  assert.match(prompt, /실행 모드: 비식별 샘플 테스트 모드/);
+  assert.match(prompt, /외부 조회·비공개 DB 저장·공개 요약·고객 제공을 하지 말고/);
+  assert.equal(canPersistExternally(state), false);
+  assert.throws(
+    () => createPublicationSummary(state, "가상 실험"),
+    /가상 샘플은 비공개 DB 저장 또는 공개 요약 전송을 할 수 없습니다/,
+  );
+  assert.equal(
+    validateState(state).some(
+      (issue) =>
+        issue.severity === "error" &&
+        ["case.maskedFolderId", "case.consent"].includes(issue.field),
+    ),
+    false,
+  );
 });
 
 test("고객용 문구의 보장 표현과 개인정보·비공개 링크를 감지한다", () => {

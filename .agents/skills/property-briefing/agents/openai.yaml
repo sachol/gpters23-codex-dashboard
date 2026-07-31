@@ -1,0 +1,4 @@
+interface:
+  display_name: "부동산 매물 브리핑"
+  short_description: "공적 근거를 교차검증해 고객용·내부용 브리핑을 만듭니다"
+  default_prompt: "Use $property-briefing to review a masked property case and prepare an evidence-based briefing."

@@ -15,10 +15,10 @@ GPTERS 23기 Codex 앱 4주 스터디 동안 공인중개사 업무 자동화 �
 
 대시보드의 체크와 메모는 브라우저에 임시 저장되며, 관리자 모드에서 `변경사항 저장`을 누르면 Google Sheets DB에 반영됩니다.
 
-## 현재 진행 상황 (2026-07-29)
+## 현재 진행 상황 (2026-07-30)
 
 - Week 1: `6/6` 완료 - 4주 실행 대시보드 기획·제작·배포·DB 연동과 사례글 작성
-- Week 2: `2/6` 진행 - 공부서류 기반 매물 브리핑 자동화를 위한 계획과 Skill·Plugin·MCP 적용 준비
+- Week 2: 구현·로컬 검증 진행 - 공적 근거 기반 매물 브리핑 비공개 앱, 프로젝트 Skill, 공개 비식별 요약 경로 구성
 - Week 3: 법원경매 사건서류 검토 보조 예정
 - Week 4: 검증된 기능을 에이전트 시스템과 AI 교육 자산으로 통합 예정
 
@@ -47,9 +47,11 @@ GPTERS 23기 Codex 앱 4주 스터디 동안 공인중개사 업무 자동화 �
 
 ## Vercel 상태
 
-- Vercel CLI 설치 완료: `55.0.0`
-- 로그인 계정: `sachol`
-- 실행 경로: `C:\Users\pc\AppData\Roaming\npm\vercel.cmd`
+- 기존 공개 프로젝트: `gpters23-codex-dashboard`
+- Vercel CLI: `58.4.0` 설치 및 `sachol` 로그인 확인 (2026-07-30)
+- 전역 배포 Skills 2곳의 평문 Vercel 토큰 제거 및 로컬 재검사 `0건`
+- Vercel 계정에서 기존 토큰 폐기는 대표님 확인 대기
+- 비공개 앱은 별도 Vercel 프로젝트와 Vercel Authentication 검증 전까지 배포하지 않음
 - Node.js: `24.14.0`
 - Codex CLI: `0.145.0`
 - GitHub 저장소: `sachol/gpters23-codex-dashboard` (`main`)
@@ -93,7 +95,14 @@ GPTERS 23기 Codex 앱 4주 스터디 동안 공인중개사 업무 자동화 �
 - `docs/windows-runtime-r6016-troubleshooting.md`: PowerShell R6016 팝업 원인과 대응
 - `docs/context-handoff.md`: 컨텍스트 압축 후 이어가기용 인수인계 메모
 - `docs/goal-alignment-review.md`: 목표 대비 현재 정렬 상태 리뷰
+- `docs/week2-property-briefing-system.md`: Week 2 비공개 앱 구조와 안전 경계
+- `docs/week2-pilot-checklist.md`: 실제 상가·빌딩 파일럿 실행·검수표
+- `docs/week2-evidence-ledger.md`: Plan 질문부터 구현·검증까지 사례 증거 장부
+- `docs/week2-case-study-draft.md`: Week 2 사례글 누적 초안
+- `docs/presentations/week2-screen-evidence-checklist.md`: 발표용 화면 증거 목록
 - `agents/property-briefing-agent.md`: 매물 브리핑 에이전트 실행 지시서
+- `.agents/skills/property-briefing/`: 저장소 원본 매물 브리핑 Skill
+- `apps/property-briefing-private/`: 별도 배포 대상 비공개 실행 앱
 - `templates/daily-log-template.md`: 매일 실습 기록 템플릿
 - `templates/repeated-work-intake.md`: 반복 업무 후보 수집표
 - `templates/property-briefing-intake.md`: 매물 브리핑 입력 체크리스트

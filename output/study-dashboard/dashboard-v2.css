@@ -2614,3 +2614,100 @@ textarea:focus-visible,
     animation: none;
   }
 }
+.week2-public-summary {
+  grid-column: 1 / -1;
+  margin-top: 16px;
+  padding: 20px;
+  background: linear-gradient(135deg, #eef7f2, #fffdf5);
+  border: 1px solid #b9d4c6;
+  border-radius: 16px;
+}
+
+.week2-public-summary > header {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.week2-public-summary > header div {
+  display: grid;
+  gap: 3px;
+}
+
+.week2-summary-kicker {
+  color: #2b6b52;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.week2-summary-state {
+  padding: 6px 10px;
+  color: #2b5947;
+  background: #dceee5;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.week2-summary-empty {
+  margin: 0;
+  color: #5d6b64;
+  line-height: 1.65;
+}
+
+.week2-summary-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.week2-summary-metrics article {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 14px;
+  background: rgb(255 255 255 / 84%);
+  border: 1px solid #d9e5df;
+  border-radius: 12px;
+}
+
+.week2-summary-metrics span,
+.week2-summary-metrics small,
+.week2-summary-date {
+  color: #68756f;
+  font-size: 0.74rem;
+}
+
+.week2-summary-metrics strong {
+  overflow-wrap: anywhere;
+  color: #183e30;
+  font-size: 1rem;
+}
+
+.week2-summary-learning {
+  margin: 12px 0 6px;
+  padding-left: 12px;
+  color: #345246;
+  border-left: 3px solid #4d8a6e;
+  line-height: 1.6;
+}
+
+@media (max-width: 880px) {
+  .week2-summary-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .week2-public-summary > header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .week2-summary-metrics {
+    grid-template-columns: 1fr;
+  }
+}

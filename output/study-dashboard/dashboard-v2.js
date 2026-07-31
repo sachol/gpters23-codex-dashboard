@@ -169,6 +169,73 @@
 
   updateLoopDashboard();
 
+  async function loadWeek2PublicSummary() {
+    const container = document.getElementById("week2PublicSummary");
+    const empty = document.getElementById("week2SummaryEmpty");
+    const metrics = document.getElementById("week2SummaryMetrics");
+    const learning = document.getElementById("week2SummaryLearning");
+    if (!container || !empty || !metrics || !learning) return;
+
+    try {
+      const response = await fetch("/api/week2-summary", {
+        method: "GET",
+        headers: { accept: "application/json" },
+        cache: "no-store",
+      });
+      if (!response.ok) {
+        if (response.status === 503) {
+          empty.textContent = "비공개 데이터 연결 전입니다. 실제 파일럿 승인 후 비식별 요약만 표시됩니다.";
+          return;
+        }
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const payload = await response.json();
+      const summary = payload?.summary;
+      if (!payload?.ok || !summary || summary.reviewPassed !== true) return;
+
+      const before = Number(summary.beforeMinutes) || 0;
+      const after = Number(summary.afterMinutes) || 0;
+      const beforeEditsMeasured =
+        summary.beforeEdits !== null &&
+        summary.beforeEdits !== undefined &&
+        summary.beforeEdits !== "";
+      const beforeEditsLabel = beforeEditsMeasured
+        ? `${Number(summary.beforeEdits) || 0}회`
+        : "미측정";
+      const reduction = before > 0 ? Math.round(((before - after) / before) * 100) : null;
+      setText("week2SummaryState", summary.workflowStatus || "승인");
+      setText("week2SummaryProperty", summary.propertyType || "비식별 매물");
+      setText("week2SummaryTime", `${before}분 / ${after}분`);
+      setText(
+        "week2SummaryReduction",
+        reduction === null ? "실제 실측값" : `활동시간 ${reduction}% 변화 · 동일 사례 학습효과 한계 포함`,
+      );
+      setText(
+        "week2SummaryEvidence",
+        `${Number(summary.evidenceCount) || 0} / ${Number(summary.conflictCount) || 0} / ${Number(summary.unresolvedCount) || 0}`,
+      );
+      setText(
+        "week2SummaryLease",
+        `${Number(summary.leaseCount) || 0}건 / Before ${beforeEditsLabel} · After ${Number(summary.afterEdits) || 0}회`,
+      );
+      learning.textContent = summary.learning
+        ? `배운 점 · ${summary.learning}`
+        : "배운 점은 실제 파일럿 검수 후 기록합니다.";
+      setText(
+        "week2SummaryDate",
+        summary.approvedAt ? `최종 승인 · ${String(summary.approvedAt).slice(0, 10)}` : "",
+      );
+      empty.hidden = true;
+      metrics.hidden = false;
+      learning.hidden = false;
+      container.dataset.loaded = "true";
+    } catch {
+      empty.textContent = "승인된 비식별 요약을 불러오지 못했습니다. 공개 보드의 기존 기능은 계속 사용할 수 있습니다.";
+    }
+  }
+
+  loadWeek2PublicSummary();
+
   const candidateData = {
     briefing: { domain: "brokerage", difficulty: 60, effect: 95, difficultyParts: [15, 20, 10, 10, 5], effectParts: [30, 20, 20, 15, 10], label: "중개업무" },
     checklist: { domain: "brokerage", difficulty: 55, effect: 90, difficultyParts: [12, 20, 8, 10, 5], effectParts: [25, 20, 20, 15, 10], label: "중개업무" },

@@ -22,6 +22,14 @@ GPTERS 23기 Codex 앱 4주 스터디 동안 공인중개사 업무 자동화 �
 
 `공부서류 기반 매물 브리핑 초안 자동화 에이전트`
 
+Week 2 구현 기준:
+
+- 저장소 원본 Skill: `.agents/skills/property-briefing`
+- 비공개 실행 앱: `apps/property-briefing-private`
+- 기존 공개 실용보드는 승인된 `PublicationSummary` 허용목록만 표시
+- 비공개 Google Sheet와 전용 Apps Script는 기존 공개 DB와 분리
+- 외부 Sheet·Apps Script·Vercel 프로젝트·환경변수·전역 Skill 설치는 로컬 검증 후 사용자 별도 승인
+
 입력자료:
 
 - 건축물대장 또는 건축물대장 API 조회 결과
@@ -83,11 +91,11 @@ GPTERS 23기 Codex 앱 4주 스터디 동안 공인중개사 업무 자동화 �
 
 ## Vercel 참고
 
-Vercel 배포가 필요한 작업에서는 Vercel CLI를 사용할 수 있다.
+2026-07-30 현재 Vercel CLI `58.4.0`과 `sachol` 로그인이 확인되었다. 배포 전 `vercel whoami`와 `.vercel/project.json`을 다시 확인하고, 토큰을 Skill·명령어·Git에 직접 기록하지 않는다.
 
-- Vercel CLI: `54.20.1`
-- 로그인 계정: `sachol`
-- 실행 경로: `C:\Users\pc\AppData\Roaming\npm\vercel.cmd`
+- 기존 공개 Vercel 프로젝트: `gpters23-codex-dashboard`
+- 비공개 앱: 별도 프로젝트로 배포
+- 보호 우선순위: Vercel Authentication, 사용할 수 없을 때만 승인된 Google 로그인 대안
 - Node.js: `24.14.0`
 
 ## Windows 작업 안정성

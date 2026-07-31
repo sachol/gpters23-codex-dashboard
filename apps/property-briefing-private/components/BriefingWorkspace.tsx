@@ -11,9 +11,11 @@ import {
 
 import {
   BUYER_PURPOSES,
+  EXECUTION_MODES,
   PROPERTY_GROUPS,
   PROPERTY_SUBTYPES,
   TIMER_STAGES,
+  canPersistExternally,
   createCodexPrompt,
   createEmptyState,
   createId,
@@ -147,6 +149,10 @@ export function BriefingWorkspace({
   );
   const issues = useMemo(() => validateState(state), [state]);
   const passed = useMemo(() => qualityPass(state), [state]);
+  const isSample =
+    state.case.executionMode === "비식별 샘플 테스트 모드";
+  const externalPersistenceAllowed = canPersistExternally(state);
+  const canPublish = passed && externalPersistenceAllowed;
   const priceBasedYieldRate = grossRentalYieldOnPrice(
     state.case.askingPrice,
     totals.contractMonthlyRent,
@@ -169,6 +175,27 @@ export function BriefingWorkspace({
         draft.case.propertySubtypeCustom = "";
       }
       return draft;
+    });
+  }
+
+  function changeExecutionMode(mode: CaseState["case"]["executionMode"]) {
+    if (mode === state.case.executionMode) return;
+    const confirmed = window.confirm(
+      "실행 모드를 바꾸면 현재 브라우저 초안이 비워지고 새 케이스가 시작됩니다. 계속할까요?",
+    );
+    if (!confirmed) return;
+    const nextState = createEmptyState(mode);
+    setState(nextState);
+    setLoadCaseId(nextState.case.caseId);
+    setManualBeforeStage(null);
+    setActiveTimer(null);
+    setLearning("");
+    setNotice({
+      kind: "info",
+      text:
+        mode === "비식별 샘플 테스트 모드"
+          ? "가상 샘플용 빈 케이스를 시작했습니다. 실제 사건 자료를 입력하지 마세요."
+          : "실제 사건용 빈 케이스를 시작했습니다.",
     });
   }
 
@@ -336,6 +363,13 @@ export function BriefingWorkspace({
   }
 
   async function saveCase() {
+    if (!externalPersistenceAllowed) {
+      setNotice({
+        kind: "error",
+        text: "샘플 테스트는 비공개 DB에 저장하지 않습니다.",
+      });
+      return;
+    }
     setBusy(true);
     setNotice(null);
     try {
@@ -393,6 +427,13 @@ export function BriefingWorkspace({
   }
 
   async function publishSummary() {
+    if (!externalPersistenceAllowed) {
+      setNotice({
+        kind: "error",
+        text: "가상 샘플은 공개 요약으로 전송할 수 없습니다.",
+      });
+      return;
+    }
     const summary = createPublicationSummary(state, learning);
     setBusy(true);
     try {
@@ -454,6 +495,11 @@ export function BriefingWorkspace({
       </header>
 
       {notice && <div className={`notice ${notice.kind}`}>{notice.text}</div>}
+      {isSample && (
+        <div className="sample-warning" role="alert">
+          가상 샘플·미검증·고객 제공 금지
+        </div>
+      )}
 
       <nav className="step-nav no-print" aria-label="업무 단계">
         {[
@@ -476,6 +522,20 @@ export function BriefingWorkspace({
           description="원본 폴더가 아닌 automation-masked 폴더만 연결합니다."
         />
         <div className="form-grid">
+          <Field label="실행 모드">
+            <select
+              value={state.case.executionMode}
+              onChange={(event) =>
+                changeExecutionMode(
+                  event.target.value as CaseState["case"]["executionMode"],
+                )
+              }
+            >
+              {EXECUTION_MODES.map((mode) => (
+                <option key={mode}>{mode}</option>
+              ))}
+            </select>
+          </Field>
           <Field label="케이스 ID">
             <input value={state.case.caseId} readOnly />
           </Field>
@@ -593,7 +653,16 @@ export function BriefingWorkspace({
           <button type="button" className="primary" onClick={copyPrompt}>
             Codex 실행 프롬프트 복사
           </button>
-          <button type="button" onClick={saveCase} disabled={busy}>
+          <button
+            type="button"
+            onClick={saveCase}
+            disabled={busy || !externalPersistenceAllowed}
+            title={
+              isSample
+                ? "샘플 테스트는 비공개 DB에 저장하지 않습니다."
+                : undefined
+            }
+          >
             비공개 DB 저장
           </button>
           <button
@@ -890,6 +959,11 @@ export function BriefingWorkspace({
           title="고객용 결과와 내부 검수 분리"
           description="인쇄 시 내부 메모·비공개 자료·조작 버튼은 제외됩니다."
         />
+        {isSample && (
+          <div className="sample-warning">
+            가상 샘플·미검증·고객 제공 금지
+          </div>
+        )}
         <div className="purpose-profile">
           <div>
             <span>주목적</span>
@@ -982,7 +1056,16 @@ export function BriefingWorkspace({
           </article>
         </div>
         <div className="actions no-print">
-          <button type="button" onClick={() => window.print()}>
+          <button
+            type="button"
+            onClick={() => window.print()}
+            disabled={isSample}
+            title={
+              isSample
+                ? "가상 샘플은 고객용 인쇄·PDF 저장을 할 수 없습니다."
+                : undefined
+            }
+          >
             고객용 화면 인쇄 / PDF 저장
           </button>
         </div>
@@ -1082,7 +1165,13 @@ export function BriefingWorkspace({
         <div className="validation-box">
           <div>
             <p className="eyebrow">완료 조건 자동 점검</p>
-            <h3>{passed ? "공개 요약 생성 가능" : "검수 진행 중"}</h3>
+            <h3>
+              {isSample
+                ? "샘플 테스트 · 공개 불가"
+                : passed
+                  ? "공개 요약 생성 가능"
+                  : "검수 진행 중"}
+            </h3>
           </div>
           <ul>
             {issues.length === 0 ? (
@@ -1107,7 +1196,10 @@ export function BriefingWorkspace({
             type="button"
             className="primary"
             onClick={publishSummary}
-            disabled={!passed || busy}
+            disabled={!canPublish || busy}
+            title={
+              isSample ? "가상 샘플은 공개 요약으로 전송할 수 없습니다." : undefined
+            }
           >
             승인된 비식별 요약 공개
           </button>

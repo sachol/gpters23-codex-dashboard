@@ -33,9 +33,13 @@ export type PropertyGroup =
   | "특수기타";
 export type TransactionType = "매매" | "임대" | "기타";
 export type RunMode = "before" | "after";
+export type ExecutionMode =
+  | "실제 사건 모드"
+  | "비식별 샘플 테스트 모드";
 
 export interface CaseRecord {
   caseId: string;
+  executionMode: ExecutionMode;
   propertyGroup: PropertyGroup;
   propertySubtype: string;
   propertySubtypeCustom: string;

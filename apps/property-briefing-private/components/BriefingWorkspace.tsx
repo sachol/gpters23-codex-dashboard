@@ -959,6 +959,13 @@ export function BriefingWorkspace({
           title="고객용 결과와 내부 검수 분리"
           description="인쇄 시 내부 메모·비공개 자료·조작 버튼은 제외됩니다."
         />
+        <div className="print-only print-heading">
+          <p>공적 근거 기반 매물 브리핑</p>
+          <h1>매수 목적별 매물 제안서</h1>
+          <span>
+            공적 자료와 임대차 현황을 대조하여 작성한 검토용 자료입니다.
+          </span>
+        </div>
         {isSample && (
           <div className="sample-warning">
             가상 샘플·미검증·고객 제공 금지
@@ -981,52 +988,72 @@ export function BriefingWorkspace({
         <div className="output-grid">
           <article className="customer-output">
             <p className="output-label">고객용</p>
-            <Field label="매수 목적별 제안서">
-              <textarea
-                className="long-text"
+            <div className="screen-only">
+              <Field label="매수 목적별 제안서">
+                <textarea
+                  className="long-text"
+                  value={state.outputs.customerBriefing}
+                  onChange={(event) =>
+                    updateState(setState, (draft) => {
+                      draft.outputs.customerBriefing = event.target.value;
+                      return draft;
+                    })
+                  }
+                />
+              </Field>
+              <Field label="최신 입지·상권·교통·개발 근거">
+                <textarea
+                  value={state.outputs.locationEvidence}
+                  onChange={(event) =>
+                    updateState(setState, (draft) => {
+                      draft.outputs.locationEvidence = event.target.value;
+                      return draft;
+                    })
+                  }
+                />
+              </Field>
+              <Field label="자산가치 검토 근거·사업 단계">
+                <textarea
+                  value={state.outputs.assetValueEvidence}
+                  onChange={(event) =>
+                    updateState(setState, (draft) => {
+                      draft.outputs.assetValueEvidence = event.target.value;
+                      return draft;
+                    })
+                  }
+                  placeholder="현재 확인 / 계획 반영 / 추진 중 / 추가 확인 필요로 구분"
+                />
+              </Field>
+              <Field label="가격 조정 요인">
+                <textarea
+                  value={state.outputs.priceAdjustmentFactors}
+                  onChange={(event) =>
+                    updateState(setState, (draft) => {
+                      draft.outputs.priceAdjustmentFactors = event.target.value;
+                      return draft;
+                    })
+                  }
+                />
+              </Field>
+            </div>
+            <div className="print-only customer-print-document">
+              <PrintField
+                label="매수 목적별 제안서"
                 value={state.outputs.customerBriefing}
-                onChange={(event) =>
-                  updateState(setState, (draft) => {
-                    draft.outputs.customerBriefing = event.target.value;
-                    return draft;
-                  })
-                }
               />
-            </Field>
-            <Field label="최신 입지·상권·교통·개발 근거">
-              <textarea
+              <PrintField
+                label="최신 입지·상권·교통·개발 근거"
                 value={state.outputs.locationEvidence}
-                onChange={(event) =>
-                  updateState(setState, (draft) => {
-                    draft.outputs.locationEvidence = event.target.value;
-                    return draft;
-                  })
-                }
               />
-            </Field>
-            <Field label="자산가치 검토 근거·사업 단계">
-              <textarea
+              <PrintField
+                label="자산가치 검토 근거·사업 단계"
                 value={state.outputs.assetValueEvidence}
-                onChange={(event) =>
-                  updateState(setState, (draft) => {
-                    draft.outputs.assetValueEvidence = event.target.value;
-                    return draft;
-                  })
-                }
-                placeholder="현재 확인 / 계획 반영 / 추진 중 / 추가 확인 필요로 구분"
               />
-            </Field>
-            <Field label="가격 조정 요인">
-              <textarea
+              <PrintField
+                label="가격 조정 요인"
                 value={state.outputs.priceAdjustmentFactors}
-                onChange={(event) =>
-                  updateState(setState, (draft) => {
-                    draft.outputs.priceAdjustmentFactors = event.target.value;
-                    return draft;
-                  })
-                }
               />
-            </Field>
+            </div>
           </article>
           <article className="internal-only">
             <p className="output-label">공인중개사 내부용</p>
@@ -1281,6 +1308,15 @@ function Field({
       <span>{label}</span>
       {children}
     </label>
+  );
+}
+
+function PrintField({ label, value }: { label: string; value: string }) {
+  return (
+    <section className="print-field">
+      <h2>{label}</h2>
+      <div>{value.trim() || "자료 없음"}</div>
+    </section>
   );
 }
 

@@ -489,6 +489,10 @@ td textarea {
   text-transform: uppercase;
 }
 
+.print-only {
+  display: none;
+}
+
 .long-text {
   min-height: 270px;
 }
@@ -677,6 +681,11 @@ footer {
 }
 
 @media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+
   body {
     background: #fff;
   }
@@ -687,10 +696,12 @@ footer {
   }
 
   .no-print,
+  .screen-only,
   .internal-only,
   .system-card,
   .notice,
   .step-nav,
+  .hero,
   #step-1,
   #step-2,
   #step-3,
@@ -699,16 +710,8 @@ footer {
     display: none !important;
   }
 
-  .hero {
+  .print-only {
     display: block;
-    padding: 20px 0;
-    color: #111;
-    background: none;
-    box-shadow: none;
-  }
-
-  .hero .lede {
-    color: #444;
   }
 
   .panel {
@@ -717,6 +720,41 @@ footer {
     padding: 14px 0;
     box-shadow: none;
     border: 0;
+  }
+
+  .output-panel {
+    break-inside: auto;
+    margin: 0;
+    padding: 0;
+  }
+
+  .output-panel > .section-heading {
+    display: none;
+  }
+
+  .print-heading {
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #164f3d;
+  }
+
+  .print-heading p {
+    margin: 0 0 6px;
+    color: #28785d;
+    font-size: 9pt;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+  }
+
+  .print-heading h1 {
+    margin: 0 0 6px;
+    color: #111;
+    font-size: 22pt;
+  }
+
+  .print-heading span {
+    color: #555;
+    font-size: 9.5pt;
   }
 
   .output-grid {
@@ -733,7 +771,39 @@ footer {
   }
 
   .customer-output {
+    padding: 0;
     background: #fff;
     border: 0;
+  }
+
+  .customer-output > .output-label {
+    display: none;
+  }
+
+  .customer-print-document {
+    color: #111;
+  }
+
+  .print-field {
+    break-inside: auto;
+    margin: 0 0 18px;
+  }
+
+  .print-field h2 {
+    break-after: avoid;
+    margin: 0 0 8px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #cbd8d1;
+    color: #164f3d;
+    font-size: 13pt;
+  }
+
+  .print-field div {
+    overflow: visible;
+    color: #111;
+    font-size: 10pt;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
   }
 }

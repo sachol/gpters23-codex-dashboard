@@ -1,6 +1,30 @@
 (() => {
   "use strict";
 
+  function summarizeTasks(tasks) {
+    const total = tasks.length;
+    const completed = tasks.filter((task) => task.completed).length;
+    return {
+      completed,
+      total,
+      status: completed === 0 ? "wait" : completed === total ? "done" : "progress"
+    };
+  }
+
+  function groupOverviewTasks(tasks, todayIso) {
+    return tasks.reduce((groups, task) => {
+      if (task.completed) groups.completed.push(task);
+      else if (task.actionDate && task.actionDate > todayIso) groups.upcoming.push(task);
+      else groups.today.push(task);
+      return groups;
+    }, { today: [], upcoming: [], completed: [] });
+  }
+
+  if (typeof document === "undefined") {
+    if (typeof module !== "undefined") module.exports = { summarizeTasks, groupOverviewTasks };
+    return;
+  }
+
   const readJson = (key, fallback) => {
     try {
       const value = JSON.parse(localStorage.getItem(key));
@@ -25,6 +49,7 @@
   const loopWeeks = [...document.querySelectorAll("[data-loop-week]")];
   const savedLoopTasks = readJson(loopTaskKey, {});
   const savedLoopNotes = readJson(loopNoteKey, {});
+  const overviewStatusLabels = { wait: "대기", progress: "진행중", done: "완료" };
 
   loopWeeks.forEach((week) => {
     const weekId = week.dataset.loopWeek;
@@ -64,6 +89,117 @@
     if (element) element.style.width = `${percent}%`;
   }
 
+  function getTodayIso() {
+    const now = new Date();
+    const local = new Date(now.getTime() - (now.getTimezoneOffset() * 60000));
+    return local.toISOString().slice(0, 10);
+  }
+
+  function getLoopTaskModels(week) {
+    return [...week.querySelectorAll("[data-loop-task]")].map((input) => {
+      const task = input.closest(".loop-task");
+      return {
+        input,
+        key: input.dataset.loopTask,
+        phase: task?.querySelector("b")?.textContent.trim() || "실행",
+        label: task?.querySelector(".loop-task-text")?.textContent.trim() || "할 일 확인",
+        actionDate: task?.dataset.actionDate || "",
+        completed: input.checked
+      };
+    });
+  }
+
+  function setStatusTag(element, status) {
+    if (!element) return;
+    element.classList.remove("wait", "progress", "done");
+    element.classList.add(status);
+  }
+
+  function appendOverviewAction(list, task, index) {
+    const item = document.createElement("li");
+    item.className = "overview-action-item";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = task.completed;
+    checkbox.disabled = task.input.disabled;
+    checkbox.setAttribute("aria-label", `${task.label} 완료 상태`);
+    checkbox.addEventListener("change", () => {
+      task.input.checked = checkbox.checked;
+      task.input.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+
+    const content = document.createElement("span");
+    const phase = document.createElement("b");
+    phase.textContent = `${index}. ${task.phase}`;
+    const label = document.createElement("span");
+    label.textContent = task.label;
+    content.append(phase, label);
+    item.append(checkbox, content);
+    list.append(item);
+  }
+
+  function formatActionDate(dateString) {
+    if (!dateString) return "일정 확인";
+    const [, month, day] = dateString.split("-").map(Number);
+    return `${month}월 ${day}일`;
+  }
+
+  function renderOverview(weekSummaries, currentWeek) {
+    weekSummaries.forEach(({ weekId, summary }) => {
+      const stage = document.querySelector(`[data-overview-week="${weekId}"]`);
+      if (!stage) return;
+      stage.dataset.status = summary.status;
+      setStatusTag(stage.querySelector("[data-overview-week-tag]"), summary.status);
+      const status = stage.querySelector("[data-overview-status]");
+      setStatusTag(status, summary.status);
+      if (status) status.textContent = `${overviewStatusLabels[summary.status]} · ${summary.completed}/${summary.total}`;
+    });
+
+    const context = document.getElementById("overviewActionContext");
+    const todayList = document.getElementById("overviewTodayActions");
+    const todayEmpty = document.getElementById("overviewTodayEmpty");
+    const upcoming = document.getElementById("overviewUpcoming");
+    const upcomingList = document.getElementById("overviewUpcomingActions");
+    const completed = document.getElementById("overviewCompleted");
+    const completedList = document.getElementById("overviewCompletedActions");
+    if (!todayList || !upcomingList || !completedList) return;
+
+    todayList.replaceChildren();
+    upcomingList.replaceChildren();
+    completedList.replaceChildren();
+
+    if (!currentWeek) {
+      if (context) context.textContent = "4주 실행루프를 모두 완료했습니다.";
+      if (todayEmpty) todayEmpty.hidden = false;
+      if (upcoming) upcoming.hidden = true;
+      if (completed) completed.hidden = true;
+      return;
+    }
+
+    const weekName = currentWeek.week.querySelector(".loop-week-head span")?.textContent.split("·")[0].trim() || "현재 주차";
+    const groups = groupOverviewTasks(getLoopTaskModels(currentWeek.week), getTodayIso());
+    if (context) context.textContent = `${weekName} 실행루프와 자동 동기화됩니다. 체크 후 관리자 모드의 변경사항 저장을 눌러야 DB에 반영됩니다.`;
+
+    groups.today.forEach((task, index) => appendOverviewAction(todayList, task, index + 1));
+    if (todayEmpty) todayEmpty.hidden = groups.today.length > 0;
+
+    groups.upcoming.forEach((task) => {
+      const item = document.createElement("li");
+      item.textContent = `${formatActionDate(task.actionDate)} · ${task.label}`;
+      upcomingList.append(item);
+    });
+    if (upcoming) upcoming.hidden = groups.upcoming.length === 0;
+
+    groups.completed.forEach((task) => {
+      const item = document.createElement("li");
+      item.textContent = task.label;
+      completedList.append(item);
+    });
+    setText("overviewCompletedCount", String(groups.completed.length));
+    if (completed) completed.hidden = groups.completed.length === 0;
+  }
+
   function updateLoopDashboard() {
     const allTasks = loopWeeks.flatMap((week) => [...week.querySelectorAll("[data-loop-task]")]);
     const completedTotal = allTasks.filter((input) => input.checked).length;
@@ -71,13 +207,15 @@
     let currentWeek = null;
     let nextTask = null;
 
+    const weekSummaries = [];
     loopWeeks.forEach((week) => {
       const tasks = [...week.querySelectorAll("[data-loop-task]")];
-      const completed = tasks.filter((input) => input.checked).length;
-      const status = completed === 0 ? "wait" : completed === tasks.length ? "done" : "progress";
+      const summary = summarizeTasks(tasks.map((input) => ({ completed: input.checked })));
+      const { completed, status } = summary;
       const percent = tasks.length ? Math.round((completed / tasks.length) * 100) : 0;
       const weekId = week.dataset.loopWeek;
       const journeyCard = journeyCards.find((card) => card.dataset.journeyWeek === weekId);
+      weekSummaries.push({ weekId, week, summary });
 
       week.dataset.status = status;
       const count = week.querySelector("[data-loop-count]");
@@ -98,6 +236,8 @@
         nextTask = tasks.find((input) => !input.checked)?.closest(".loop-task")?.querySelector(".loop-task-text")?.textContent.trim();
       }
     });
+
+    renderOverview(weekSummaries, currentWeek);
 
     setText("loopCompletion", `${completedTotal}/${allTasks.length}`);
     setText("journeyPercent", `${overallPercent}%`);
@@ -592,6 +732,7 @@
     });
     if (cloudSave) cloudSave.disabled = !enabled || cloudBusy || !cloudConfigured;
     if (cloudLogin) cloudLogin.textContent = cloudAuthenticated && cloudConfigured ? "관리자 로그아웃" : "관리자 편집";
+    updateLoopDashboard();
   }
 
   function nullableNumber(value) {

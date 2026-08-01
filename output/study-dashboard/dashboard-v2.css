@@ -1173,6 +1173,91 @@ h1 {
   background: var(--surface-soft);
 }
 
+.stage[data-status="done"] {
+  background: var(--surface-selected);
+}
+
+.stage[data-status="progress"] {
+  border-color: color-mix(in srgb, var(--brand) 42%, var(--border-soft));
+}
+
+.overview-action-context {
+  margin: -4px 0 12px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.overview-action-list {
+  padding: 0;
+  list-style: none;
+}
+
+.next-actions .overview-action-item {
+  grid-template-columns: 22px 1fr;
+  align-items: start;
+}
+
+.overview-action-item input {
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  accent-color: var(--green);
+}
+
+.overview-action-item b,
+.overview-action-item span span {
+  display: block;
+}
+
+.overview-action-item b {
+  margin-bottom: 2px;
+  color: var(--brand);
+  font-size: 12px;
+}
+
+.overview-action-empty {
+  margin: 0;
+  padding: 14px;
+  border-radius: 8px;
+  background: var(--surface-muted);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.overview-upcoming,
+.overview-completed {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.overview-upcoming h3,
+.overview-completed summary {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.overview-upcoming ul,
+.overview-completed ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.overview-completed summary {
+  cursor: pointer;
+}
+
+.overview-completed li {
+  text-decoration: line-through;
+}
+
 .candidate-card:hover,
 .routine-card:hover,
 .benchmark-item:hover,

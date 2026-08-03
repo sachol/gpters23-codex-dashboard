@@ -1,3 +1,13 @@
+const DEFAULT_BRIDGE_TIMEOUT_MS = 25000;
+
+function getBridgeTimeoutMs(env = process.env) {
+  const configured = Number(env.SHEET_BRIDGE_TIMEOUT_MS);
+  if (Number.isFinite(configured) && configured >= 5000 && configured <= 60000) {
+    return configured;
+  }
+  return DEFAULT_BRIDGE_TIMEOUT_MS;
+}
+
 function assertBridgeConfig(env = process.env) {
   if (!env.APPS_SCRIPT_URL || !env.SHEET_API_SECRET) {
     const error = new Error("Google Sheets bridge is not configured");
@@ -9,7 +19,7 @@ function assertBridgeConfig(env = process.env) {
 async function requestBridge(action, payload = {}, env = process.env, fetchImpl = fetch) {
   assertBridgeConfig(env);
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 12000);
+  const timeout = setTimeout(() => controller.abort(), getBridgeTimeoutMs(env));
   try {
     const response = await fetchImpl(env.APPS_SCRIPT_URL, {
       method: "POST",
@@ -50,6 +60,8 @@ async function requestBridge(action, payload = {}, env = process.env, fetchImpl 
 }
 
 module.exports = {
+  DEFAULT_BRIDGE_TIMEOUT_MS,
+  getBridgeTimeoutMs,
   assertBridgeConfig,
   requestBridge,
 };

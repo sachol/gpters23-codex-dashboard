@@ -1,9 +1,19 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const {
+  DEFAULT_BRIDGE_TIMEOUT_MS,
+  getBridgeTimeoutMs,
   assertBridgeConfig,
   requestBridge,
 } = require("../server/apps-script.cjs");
+
+test("bridge timeout allows slow Apps Script cold starts within a bounded range", () => {
+  assert.equal(DEFAULT_BRIDGE_TIMEOUT_MS, 25000);
+  assert.equal(getBridgeTimeoutMs({}), 25000);
+  assert.equal(getBridgeTimeoutMs({ SHEET_BRIDGE_TIMEOUT_MS: "30000" }), 30000);
+  assert.equal(getBridgeTimeoutMs({ SHEET_BRIDGE_TIMEOUT_MS: "1000" }), 25000);
+  assert.equal(getBridgeTimeoutMs({ SHEET_BRIDGE_TIMEOUT_MS: "invalid" }), 25000);
+});
 
 test("bridge configuration requires URL and secret", () => {
   assert.throws(() => assertBridgeConfig({}), /not configured/);

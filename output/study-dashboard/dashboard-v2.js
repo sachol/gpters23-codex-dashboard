@@ -11,6 +11,13 @@
     };
   }
 
+  function summarizePhases(tasks, phaseKeys = ["plan", "execute", "verify", "expand"]) {
+    return Object.fromEntries(phaseKeys.map((phaseKey) => [
+      phaseKey,
+      summarizeTasks(tasks.filter((task) => task.phaseKey === phaseKey))
+    ]));
+  }
+
   function groupOverviewTasks(tasks, todayIso) {
     return tasks.reduce((groups, task) => {
       if (task.completed) groups.completed.push(task);
@@ -21,7 +28,7 @@
   }
 
   if (typeof document === "undefined") {
-    if (typeof module !== "undefined") module.exports = { summarizeTasks, groupOverviewTasks };
+    if (typeof module !== "undefined") module.exports = { summarizeTasks, summarizePhases, groupOverviewTasks };
     return;
   }
 
@@ -50,6 +57,8 @@
   const savedLoopTasks = readJson(loopTaskKey, {});
   const savedLoopNotes = readJson(loopNoteKey, {});
   const overviewStatusLabels = { wait: "대기", progress: "진행중", done: "완료" };
+  const overviewPhaseCards = [...document.querySelectorAll("[data-overview-phase]")];
+  const curriculumRows = [...document.querySelectorAll("[data-curriculum-week]")];
 
   loopWeeks.forEach((week) => {
     const weekId = week.dataset.loopWeek;
@@ -101,6 +110,7 @@
       return {
         input,
         key: input.dataset.loopTask,
+        phaseKey: task?.dataset.phase || "execute",
         phase: task?.querySelector("b")?.textContent.trim() || "실행",
         label: task?.querySelector(".loop-task-text")?.textContent.trim() || "할 일 확인",
         actionDate: task?.dataset.actionDate || "",
@@ -113,6 +123,58 @@
     if (!element) return;
     element.classList.remove("wait", "progress", "done");
     element.classList.add(status);
+  }
+
+  function renderCurrentFlow(currentWeek) {
+    const title = document.getElementById("overviewFlowTitle");
+    const context = document.getElementById("overviewFlowContext");
+    if (!currentWeek) {
+      if (title) title.textContent = "4주 사례 실행 흐름 완료";
+      if (context) context.textContent = "모든 주차가 완료되었습니다. 이후 운영과 확장 기록은 실행 루프에서 계속 관리합니다.";
+      overviewPhaseCards.forEach((card) => {
+        card.dataset.status = "done";
+        card.disabled = true;
+        const status = card.querySelector("[data-overview-phase-status]");
+        setStatusTag(status, "done");
+        if (status) status.textContent = "완료";
+      });
+      return;
+    }
+
+    const weekId = currentWeek.week.dataset.loopWeek;
+    const weekName = currentWeek.week.querySelector(".loop-week-head span")?.textContent.split("·")[0].trim() || "현재 주차";
+    const tasks = getLoopTaskModels(currentWeek.week);
+    const phaseSummaries = summarizePhases(tasks);
+    if (title) title.textContent = `${weekName} 현재 사례 실행 흐름`;
+    if (context) context.textContent = `Google Sheets의 ${weekName} 체크 상태와 자동 동기화됩니다. 단계를 누르면 실행 루프의 해당 업무로 이동합니다.`;
+
+    overviewPhaseCards.forEach((card) => {
+      const phaseKey = card.dataset.overviewPhase;
+      const summary = phaseSummaries[phaseKey] || { completed: 0, total: 0, status: "wait" };
+      card.dataset.status = summary.status;
+      card.dataset.targetWeek = weekId;
+      card.disabled = false;
+      const status = card.querySelector("[data-overview-phase-status]");
+      setStatusTag(status, summary.status);
+      if (status) status.textContent = `${overviewStatusLabels[summary.status]} · ${summary.completed}/${summary.total}`;
+    });
+  }
+
+  function renderCurriculumAlignment(weekSummaries, currentWeek) {
+    const currentWeekId = currentWeek?.week.dataset.loopWeek || "";
+    const summariesById = new Map(weekSummaries.map(({ weekId, summary }) => [weekId, summary]));
+    curriculumRows.forEach((row) => {
+      const weekId = row.dataset.curriculumWeek;
+      const summary = summariesById.get(weekId);
+      if (!summary) return;
+      row.dataset.status = summary.status;
+      row.classList.toggle("is-current", weekId === currentWeekId);
+      if (weekId === currentWeekId) row.setAttribute("aria-current", "step");
+      else row.removeAttribute("aria-current");
+      const status = row.querySelector("[data-curriculum-status]");
+      setStatusTag(status, summary.status);
+      if (status) status.textContent = `${overviewStatusLabels[summary.status]} · ${summary.completed}/${summary.total}`;
+    });
   }
 
   function appendOverviewAction(list, task, index) {
@@ -155,6 +217,9 @@
       setStatusTag(status, summary.status);
       if (status) status.textContent = `${overviewStatusLabels[summary.status]} · ${summary.completed}/${summary.total}`;
     });
+
+    renderCurrentFlow(currentWeek);
+    renderCurriculumAlignment(weekSummaries, currentWeek);
 
     const context = document.getElementById("overviewActionContext");
     const todayList = document.getElementById("overviewTodayActions");
@@ -275,6 +340,23 @@
     card.querySelector("[data-journey-status]")?.addEventListener("click", () => {
       document.querySelector('[data-target="weekly-routine"]')?.click();
       setTimeout(() => document.getElementById(`loop-${card.dataset.journeyWeek}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+    });
+  });
+
+  overviewPhaseCards.forEach((card) => {
+    card.addEventListener("click", () => {
+      const weekId = card.dataset.targetWeek;
+      const phaseKey = card.dataset.overviewPhase;
+      if (!weekId || !phaseKey) return;
+      document.querySelector('[data-target="weekly-routine"]')?.click();
+      setTimeout(() => {
+        const week = document.querySelector(`[data-loop-week="${weekId}"]`);
+        const phaseTasks = [...(week?.querySelectorAll(`.loop-task[data-phase="${phaseKey}"]`) || [])];
+        const target = phaseTasks.find((task) => !task.querySelector("input")?.checked) || phaseTasks[0] || week;
+        target?.scrollIntoView({ behavior: "smooth", block: "center" });
+        target?.classList.add("is-overview-target");
+        setTimeout(() => target?.classList.remove("is-overview-target"), 1400);
+      }, 80);
     });
   });
 

@@ -1444,29 +1444,34 @@
         </div>
       </section>
 
-      <section class="panel" style="margin-bottom:14px">
-        <h2>Week 1 기획형 사례 흐름 <span class="tooltip" tabindex="0" data-tip="1주차는 완성 자동화보다 앞으로 실험할 후보와 기준을 만든 것 자체가 발표 가능한 사례입니다.">?</span></h2>
-        <div class="planning-board" aria-label="Week 1 기획형 사례 흐름">
-          <div class="summary-card">
-            <span>1단계</span>
-            <strong>반복업무 후보화</strong>
-            <p>중개실무 4개, 법원경매 3개, AI 교육 3개를 후보로 정리합니다.</p>
-          </div>
-          <div class="summary-card">
-            <span>2단계</span>
-            <strong>선정 기준 적용</strong>
-            <p>반복성, 시간절감 가능성, 검수 안전성, 발표 적합성으로 비교합니다.</p>
-          </div>
-          <div class="summary-card">
-            <span>3단계</span>
-            <strong>2~4주 배치</strong>
-            <p>후보 중 매주 1개 이상을 골라 계획, 실천, 수정계획으로 기록합니다.</p>
-          </div>
-          <div class="summary-card">
-            <span>4단계</span>
-            <strong>대시보드가 사례</strong>
-            <p>체크 상태와 주차 배치를 남겨 성장과 이행 과정을 보여줍니다.</p>
-          </div>
+      <section class="panel overview-flow-panel" style="margin-bottom:14px">
+        <h2><span id="overviewFlowTitle">현재 사례 실행 흐름</span> <span class="tooltip" tabindex="0" data-tip="실행 루프의 주차별 체크 상태를 단계별로 다시 계산해 표시합니다.">?</span></h2>
+        <p class="overview-flow-context" id="overviewFlowContext">실행 루프와 자동 동기화됩니다.</p>
+        <div class="planning-board" aria-label="현재 사례 실행 흐름">
+          <button class="summary-card overview-phase-card" type="button" data-overview-phase="plan" data-status="wait">
+            <span>01 계획</span>
+            <strong>업무·목표·완료 기준</strong>
+            <p>실제 문제와 성공 기준을 먼저 정합니다.</p>
+            <small class="tag wait" data-overview-phase-status>대기 · 0/1</small>
+          </button>
+          <button class="summary-card overview-phase-card" type="button" data-overview-phase="execute" data-status="wait">
+            <span>02 실행</span>
+            <strong>실제 업무 적용·산출물</strong>
+            <p>Codex 기능을 업무에 적용하고 결과를 만듭니다.</p>
+            <small class="tag wait" data-overview-phase-status>대기 · 0/1</small>
+          </button>
+          <button class="summary-card overview-phase-card" type="button" data-overview-phase="verify" data-status="wait">
+            <span>03 검증</span>
+            <strong>인증·사례글·피드백</strong>
+            <p>도전과제, 사례글, 발표 피드백을 확인합니다.</p>
+            <small class="tag wait" data-overview-phase-status>대기 · 0/3</small>
+          </button>
+          <button class="summary-card overview-phase-card" type="button" data-overview-phase="expand" data-status="wait">
+            <span>04 확장</span>
+            <strong>수정 계획·다음 실험</strong>
+            <p>검수 규칙을 보완하고 다음 실행을 설계합니다.</p>
+            <small class="tag wait" data-overview-phase-status>대기 · 0/1</small>
+          </button>
         </div>
       </section>
 
@@ -1482,29 +1487,29 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr data-curriculum-week="week1" data-status="wait">
               <td>7/22 수 21:00</td>
               <td>Codex 앱 첫 사용, 기능 지도, 반복 업무 1개 선정</td>
               <td>후보 10개 중 2~4주 실험 후보 선택, 현재 방식과 작업시간 기록</td>
-              <td><span class="tag progress">준비중</span></td>
+              <td><span class="tag wait" data-curriculum-status>대기 · 0/6</span></td>
             </tr>
-            <tr>
+            <tr data-curriculum-week="week2" data-status="wait">
               <td>7/29 수 21:00</td>
               <td>Skill, Plugin, MCP로 Codex 확장</td>
               <td>매물 브리핑 업무에 반복 지시서와 확장 도구 조합 적용</td>
-              <td><span class="tag wait">대기</span></td>
+              <td><span class="tag wait" data-curriculum-status>대기 · 0/6</span></td>
             </tr>
-            <tr>
+            <tr data-curriculum-week="week3" data-status="wait">
               <td>8/5 수 21:00</td>
               <td>Browser Use, Computer Use, Record & Replay, Remote connections, App Shot 체험</td>
               <td>경매 사건서류 확인 흐름에 적합한 기능을 선택해 작은 자동화 사례 1개 실험</td>
-              <td><span class="tag wait">대기</span></td>
+              <td><span class="tag wait" data-curriculum-status>대기 · 0/6</span></td>
             </tr>
-            <tr>
+            <tr data-curriculum-week="week4" data-status="wait">
               <td>8/12 수 21:00</td>
               <td>내 업무용 Codex 에이전트 시스템 설계</td>
               <td>AGENTS.md, 실행 프롬프트, 검수 기준, 최종 사례글과 발표자료 완성</td>
-              <td><span class="tag wait">대기</span></td>
+              <td><span class="tag wait" data-curriculum-status>대기 · 0/6</span></td>
             </tr>
           </tbody>
         </table>
